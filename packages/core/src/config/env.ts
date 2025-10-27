@@ -17,12 +17,11 @@ export interface EnvironmentConfig {
  */
 export function loadEnvironmentConfig(): EnvironmentConfig {
   // Check if we're in Node.js environment
-  const isNode = typeof process !== 'undefined' &&
-                 process.env !== undefined;
+  const isNode = typeof process !== 'undefined' && process.env !== undefined;
 
   // Check if we're using import.meta.env (Vite/ESM)
-  const hasImportMetaEnv = typeof import.meta !== 'undefined' &&
-                           typeof import.meta.env !== 'undefined';
+  const hasImportMetaEnv =
+    typeof import.meta !== 'undefined' && typeof import.meta.env !== 'undefined';
 
   let env: Record<string, string | undefined>;
 
@@ -40,9 +39,10 @@ export function loadEnvironmentConfig(): EnvironmentConfig {
   return {
     jellyfinApiKey: env.JELLYFIN_API_KEY || env.VITE_JELLYFIN_API_KEY,
     jellyfinServerUrl: env.JELLYFIN_SERVER_URL || env.VITE_JELLYFIN_SERVER_URL,
-    jellyfinClientName: env.JELLYFIN_CLIENT_NAME || env.VITE_JELLYFIN_CLIENT_NAME || 'Jellyfin Mini Client',
+    jellyfinClientName:
+      env.JELLYFIN_CLIENT_NAME || env.VITE_JELLYFIN_CLIENT_NAME || 'Jellyfin Mini Client',
     jellyfinDeviceName: env.JELLYFIN_DEVICE_NAME || env.VITE_JELLYFIN_DEVICE_NAME || 'Web Browser',
-    jellyfinDeviceId: env.JELLYFIN_DEVICE_ID || env.VITE_JELLYFIN_DEVICE_ID
+    jellyfinDeviceId: env.JELLYFIN_DEVICE_ID || env.VITE_JELLYFIN_DEVICE_ID,
   };
 }
 
@@ -68,7 +68,7 @@ export function getRequiredConfig(): Required<Omit<EnvironmentConfig, 'jellyfinD
     jellyfinApiKey: config.jellyfinApiKey,
     jellyfinServerUrl: config.jellyfinServerUrl,
     jellyfinClientName: config.jellyfinClientName!,
-    jellyfinDeviceName: config.jellyfinDeviceName!
+    jellyfinDeviceName: config.jellyfinDeviceName!,
   };
 }
 

@@ -1,6 +1,11 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { JellyfinClient } from '../src/api/client.js';
-import { ClientInfo, AuthenticationError, JellyfinError, NetworkError } from '../src/models/types.js';
+import { JellyfinClient } from '../../src/api/client.js';
+import {
+  ClientInfo,
+  AuthenticationError,
+  JellyfinError,
+  NetworkError,
+} from '../../src/models/types.js';
 
 // Mock global fetch
 global.fetch = vi.fn();
@@ -14,7 +19,7 @@ describe('JellyfinClient', () => {
       name: 'Jellyfin Mini Test',
       device: 'Test Device',
       deviceId: 'test-device-id',
-      version: '1.0.0'
+      version: '1.0.0',
     };
 
     client = new JellyfinClient('https://demo.jellyfin.org', clientInfo);
@@ -86,7 +91,7 @@ describe('JellyfinClient', () => {
     it('should make GET request', async () => {
       const mockResponse = {
         ok: true,
-        json: () => Promise.resolve({ data: 'test' })
+        json: () => Promise.resolve({ data: 'test' }),
       };
 
       (global.fetch as any).mockResolvedValue(mockResponse);
@@ -97,7 +102,7 @@ describe('JellyfinClient', () => {
       expect(global.fetch).toHaveBeenCalledWith(
         'https://demo.jellyfin.org/test',
         expect.objectContaining({
-          method: 'GET'
+          method: 'GET',
         })
       );
     });
@@ -105,7 +110,7 @@ describe('JellyfinClient', () => {
     it('should make GET request with params', async () => {
       const mockResponse = {
         ok: true,
-        json: () => Promise.resolve({ data: 'test' })
+        json: () => Promise.resolve({ data: 'test' }),
       };
 
       (global.fetch as any).mockResolvedValue(mockResponse);
@@ -121,7 +126,7 @@ describe('JellyfinClient', () => {
     it('should handle array params', async () => {
       const mockResponse = {
         ok: true,
-        json: () => Promise.resolve({})
+        json: () => Promise.resolve({}),
       };
 
       (global.fetch as any).mockResolvedValue(mockResponse);
@@ -137,7 +142,7 @@ describe('JellyfinClient', () => {
     it('should skip null and undefined params', async () => {
       const mockResponse = {
         ok: true,
-        json: () => Promise.resolve({})
+        json: () => Promise.resolve({}),
       };
 
       (global.fetch as any).mockResolvedValue(mockResponse);
@@ -153,7 +158,7 @@ describe('JellyfinClient', () => {
     it('should make POST request', async () => {
       const mockResponse = {
         ok: true,
-        json: () => Promise.resolve({ result: 'success' })
+        json: () => Promise.resolve({ result: 'success' }),
       };
 
       (global.fetch as any).mockResolvedValue(mockResponse);
@@ -165,7 +170,7 @@ describe('JellyfinClient', () => {
         'https://demo.jellyfin.org/test',
         expect.objectContaining({
           method: 'POST',
-          body: JSON.stringify({ data: 'value' })
+          body: JSON.stringify({ data: 'value' }),
         })
       );
     });
@@ -173,7 +178,7 @@ describe('JellyfinClient', () => {
     it('should make DELETE request', async () => {
       const mockResponse = {
         ok: true,
-        json: () => Promise.resolve({})
+        json: () => Promise.resolve({}),
       };
 
       (global.fetch as any).mockResolvedValue(mockResponse);
@@ -183,7 +188,7 @@ describe('JellyfinClient', () => {
       expect(global.fetch).toHaveBeenCalledWith(
         'https://demo.jellyfin.org/test',
         expect.objectContaining({
-          method: 'DELETE'
+          method: 'DELETE',
         })
       );
     });
@@ -191,7 +196,7 @@ describe('JellyfinClient', () => {
     it('should include auth headers', async () => {
       const mockResponse = {
         ok: true,
-        json: () => Promise.resolve({})
+        json: () => Promise.resolve({}),
       };
 
       (global.fetch as any).mockResolvedValue(mockResponse);
@@ -202,8 +207,8 @@ describe('JellyfinClient', () => {
         expect.any(String),
         expect.objectContaining({
           headers: expect.objectContaining({
-            'X-Emby-Authorization': expect.stringContaining('MediaBrowser')
-          })
+            'X-Emby-Authorization': expect.stringContaining('MediaBrowser'),
+          }),
         })
       );
     });
@@ -213,7 +218,7 @@ describe('JellyfinClient', () => {
 
       const mockResponse = {
         ok: true,
-        json: () => Promise.resolve({})
+        json: () => Promise.resolve({}),
       };
 
       (global.fetch as any).mockResolvedValue(mockResponse);
@@ -224,8 +229,8 @@ describe('JellyfinClient', () => {
         expect.any(String),
         expect.objectContaining({
           headers: expect.objectContaining({
-            'X-Emby-Token': 'test-token'
-          })
+            'X-Emby-Token': 'test-token',
+          }),
         })
       );
     });
@@ -237,7 +242,7 @@ describe('JellyfinClient', () => {
         ok: false,
         status: 401,
         statusText: 'Unauthorized',
-        json: () => Promise.resolve({ message: 'Invalid token' })
+        json: () => Promise.resolve({ message: 'Invalid token' }),
       };
 
       (global.fetch as any).mockResolvedValue(mockResponse);
@@ -250,7 +255,7 @@ describe('JellyfinClient', () => {
         ok: false,
         status: 403,
         statusText: 'Forbidden',
-        json: () => Promise.resolve({})
+        json: () => Promise.resolve({}),
       };
 
       (global.fetch as any).mockResolvedValue(mockResponse);
@@ -263,7 +268,7 @@ describe('JellyfinClient', () => {
         ok: false,
         status: 500,
         statusText: 'Internal Server Error',
-        json: () => Promise.resolve({ message: 'Server error' })
+        json: () => Promise.resolve({ message: 'Server error' }),
       };
 
       (global.fetch as any).mockResolvedValue(mockResponse);
@@ -282,7 +287,7 @@ describe('JellyfinClient', () => {
         ok: false,
         status: 500,
         statusText: 'Internal Server Error',
-        json: () => Promise.reject(new Error('Not JSON'))
+        json: () => Promise.reject(new Error('Not JSON')),
       };
 
       (global.fetch as any).mockResolvedValue(mockResponse);
@@ -307,7 +312,7 @@ describe('JellyfinClient', () => {
         tag: 'abc123',
         maxWidth: 300,
         maxHeight: 300,
-        quality: 90
+        quality: 90,
       });
 
       expect(url).toContain('tag=abc123');
@@ -329,7 +334,7 @@ describe('JellyfinClient', () => {
       const url = client.getStreamUrl('item-123', {
         audioCodec: 'mp3',
         maxStreamingBitrate: '128000',
-        container: 'mp3'
+        container: 'mp3',
       });
 
       expect(url).toContain('audioCodec=mp3');
@@ -348,7 +353,7 @@ describe('JellyfinClient', () => {
     it('should get server info', async () => {
       const mockResponse = {
         ok: true,
-        json: () => Promise.resolve({ ServerName: 'Test Server' })
+        json: () => Promise.resolve({ ServerName: 'Test Server' }),
       };
 
       (global.fetch as any).mockResolvedValue(mockResponse);

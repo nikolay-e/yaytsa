@@ -1,7 +1,5 @@
 {
   "name": "@jellyfin-mini/core",
-  "version": "0.1.0",
-  "description": "Core business logic for Jellyfin Mini Client",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -12,9 +10,6 @@
     "test:coverage": "vitest run --coverage",
     "test:integration": "vitest run --config vitest.integration.config.ts"
   },
-  "keywords": ["jellyfin", "music", "client"],
-  "author": "",
-  "license": "MIT",
   "devDependencies": {
     "@types/node": "^20.10.0",
     "@vitest/coverage-v8": "^1.0.4",

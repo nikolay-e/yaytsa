@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { validateServerUrl } from '../src/api/auth.js';
+import { validateServerUrl } from '../../src/api/auth.js';
 
 describe('validateServerUrl', () => {
   it('should accept HTTPS URLs', () => {

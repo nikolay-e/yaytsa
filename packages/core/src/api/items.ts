@@ -10,7 +10,7 @@ import {
   AudioItem,
   MusicAlbum,
   MusicArtist,
-  AuthenticationError
+  AuthenticationError,
 } from '../models/types.js';
 
 export class ItemsService {
@@ -69,7 +69,7 @@ export class ItemsService {
       SortOrder: 'Ascending',
       StartIndex: options?.startIndex,
       Limit: options?.limit,
-      SearchTerm: options?.searchTerm
+      SearchTerm: options?.searchTerm,
     };
 
     if (options?.parentId) {
@@ -103,7 +103,7 @@ export class ItemsService {
       SortOrder: 'Ascending',
       StartIndex: options?.startIndex,
       Limit: options?.limit,
-      SearchTerm: options?.searchTerm
+      SearchTerm: options?.searchTerm,
     };
 
     return this.queryItems<MusicArtist>(query);
@@ -131,13 +131,13 @@ export class ItemsService {
         'AlbumId',
         'AlbumPrimaryImageTag',
         'Genres',
-        'DateCreated'
+        'DateCreated',
       ],
       SortBy: options?.sortBy || 'ParentIndexNumber,IndexNumber,SortName',
       SortOrder: 'Ascending',
       StartIndex: options?.startIndex,
       Limit: options?.limit,
-      SearchTerm: options?.searchTerm
+      SearchTerm: options?.searchTerm,
     };
 
     if (options?.parentId) {
@@ -186,9 +186,12 @@ export class ItemsService {
   /**
    * Search across all music items
    */
-  async search(searchTerm: string, options?: {
-    limit?: number;
-  }): Promise<{
+  async search(
+    searchTerm: string,
+    options?: {
+      limit?: number;
+    }
+  ): Promise<{
     albums: MusicAlbum[];
     artists: MusicArtist[];
     tracks: AudioItem[];
@@ -198,13 +201,13 @@ export class ItemsService {
     const [albums, artists, tracks] = await Promise.all([
       this.getAlbums({ searchTerm, limit }),
       this.getArtists({ searchTerm, limit }),
-      this.getTracks({ searchTerm, limit })
+      this.getTracks({ searchTerm, limit }),
     ]);
 
     return {
       albums: albums.Items,
       artists: artists.Items,
-      tracks: tracks.Items
+      tracks: tracks.Items,
     };
   }
 
@@ -214,7 +217,7 @@ export class ItemsService {
   async getRecentAlbums(limit: number = 20): Promise<MusicAlbum[]> {
     const result = await this.getAlbums({
       sortBy: 'DateCreated',
-      limit
+      limit,
     });
     return result.Items;
   }

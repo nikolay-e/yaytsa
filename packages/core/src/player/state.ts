@@ -12,7 +12,7 @@ import {
   ShuffleMode,
   PlaybackProgressInfo,
   PlaybackStartInfo,
-  PlaybackStopInfo
+  PlaybackStopInfo,
 } from '../models/types.js';
 
 // Jellyfin uses ticks (100-nanosecond intervals)
@@ -28,7 +28,7 @@ export class PlaybackState {
     muted: false,
     repeatMode: 'off',
     shuffleMode: 'off',
-    error: null
+    error: null,
   };
 
   private progressReportTimer: ReturnType<typeof setTimeout> | null = null;
@@ -181,7 +181,7 @@ export class PlaybackState {
       PlayMethod: 'DirectPlay',
       CanSeek: true,
       VolumeLevel: Math.round(this.state.volume * 100),
-      IsMuted: this.state.muted
+      IsMuted: this.state.muted,
     };
 
     try {
@@ -205,7 +205,7 @@ export class PlaybackState {
       IsPaused: this.state.status === 'paused',
       PlayMethod: 'DirectPlay',
       VolumeLevel: Math.round(this.state.volume * 100),
-      IsMuted: this.state.muted
+      IsMuted: this.state.muted,
     };
 
     try {
@@ -226,7 +226,7 @@ export class PlaybackState {
 
     const info: PlaybackStopInfo = {
       ItemId: this.state.currentItem.Id,
-      PositionTicks: this.getCurrentTimeTicks()
+      PositionTicks: this.getCurrentTimeTicks(),
     };
 
     try {
@@ -277,10 +277,10 @@ export class PlaybackState {
       currentTime: 0,
       duration: 0,
       volume: this.state.volume, // Preserve volume
-      muted: this.state.muted,   // Preserve mute
+      muted: this.state.muted, // Preserve mute
       repeatMode: this.state.repeatMode,
       shuffleMode: this.state.shuffleMode,
-      error: null
+      error: null,
     };
   }
 }

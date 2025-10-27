@@ -72,9 +72,7 @@ describe.skipIf(!integrationConfig.useApiKey)('Playback State Integration', () =
       expect(Array.isArray(sessions)).toBe(true);
 
       // Find our session
-      const ourSession = sessions.find(
-        (s: any) => s.DeviceId === integrationConfig.deviceId
-      );
+      const ourSession = sessions.find((s: any) => s.DeviceId === integrationConfig.deviceId);
 
       if (ourSession) {
         console.log(`  ℹ️  Session found: ${ourSession.Client}`);
@@ -100,9 +98,7 @@ describe.skipIf(!integrationConfig.useApiKey)('Playback State Integration', () =
 
       // Verify session shows correct position
       const sessions = await client.get('/Sessions');
-      const ourSession = sessions.find(
-        (s: any) => s.DeviceId === integrationConfig.deviceId
-      );
+      const ourSession = sessions.find((s: any) => s.DeviceId === integrationConfig.deviceId);
 
       if (ourSession?.PlayState) {
         console.log(`  ℹ️  Position: ${ourSession.PlayState.PositionTicks / 10_000_000}s`);
@@ -126,9 +122,7 @@ describe.skipIf(!integrationConfig.useApiKey)('Playback State Integration', () =
       await state.reportPlaybackProgress();
 
       const sessions = await client.get('/Sessions');
-      const ourSession = sessions.find(
-        (s: any) => s.DeviceId === integrationConfig.deviceId
-      );
+      const ourSession = sessions.find((s: any) => s.DeviceId === integrationConfig.deviceId);
 
       if (ourSession?.PlayState) {
         expect(ourSession.PlayState.IsPaused).toBe(true);
@@ -151,13 +145,13 @@ describe.skipIf(!integrationConfig.useApiKey)('Playback State Integration', () =
       await state.reportPlaybackStop();
 
       const sessions = await client.get('/Sessions');
-      const ourSession = sessions.find(
-        (s: any) => s.DeviceId === integrationConfig.deviceId
-      );
+      const ourSession = sessions.find((s: any) => s.DeviceId === integrationConfig.deviceId);
 
       if (ourSession) {
         // After stop, NowPlayingItem should be null or undefined
-        console.log(`  ℹ️  Playback stopped, session state: ${ourSession.NowPlayingItem ? 'playing' : 'idle'}`);
+        console.log(
+          `  ℹ️  Playback stopped, session state: ${ourSession.NowPlayingItem ? 'playing' : 'idle'}`
+        );
       }
     });
   });
@@ -304,13 +298,10 @@ describe.skipIf(!integrationConfig.useApiKey)('Playback State Integration', () =
       //   console.log('  ⊘  Skipped: No tracks available');
       //   return;
       // }
-
       // state.setCurrentItem(testTrack);
-
       // // Negative position should be clamped to 0
       // state.setCurrentTime(-10);
       // expect(state.getCurrentTime()).toBeGreaterThanOrEqual(0);
-
       // console.log('  ℹ️  Negative position handled gracefully');
     });
   });

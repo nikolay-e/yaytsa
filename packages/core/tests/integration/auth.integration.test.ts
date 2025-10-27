@@ -33,27 +33,33 @@ describe('Authentication Integration', () => {
       expect(client.getUserId()).toBeTruthy();
     });
 
-    it.skipIf(!integrationConfig.useApiKey)('should validate session with existing API key', async () => {
-      // Initialize with API key
-      await client.initWithApiKey(integrationConfig.apiKey);
+    it.skipIf(!integrationConfig.useApiKey)(
+      'should validate session with existing API key',
+      async () => {
+        // Initialize with API key
+        await client.initWithApiKey(integrationConfig.apiKey);
 
-      // Validate the session
-      const isValid = await authService.validateSession();
+        // Validate the session
+        const isValid = await authService.validateSession();
 
-      expect(isValid).toBe(true);
-    });
+        expect(isValid).toBe(true);
+      }
+    );
 
-    it.skipIf(!integrationConfig.useApiKey)('should make authenticated requests with API key', async () => {
-      await client.initWithApiKey(integrationConfig.apiKey);
+    it.skipIf(!integrationConfig.useApiKey)(
+      'should make authenticated requests with API key',
+      async () => {
+        await client.initWithApiKey(integrationConfig.apiKey);
 
-      // Test authenticated request - get system info
-      const response = await client.get('/System/Info');
+        // Test authenticated request - get system info
+        const response = await client.get('/System/Info');
 
-      expect(response).toBeDefined();
-      expect(response.ServerName).toBeDefined();
-      expect(response.Version).toBeDefined();
-      expect(response.Id).toBeDefined();
-    });
+        expect(response).toBeDefined();
+        expect(response.ServerName).toBeDefined();
+        expect(response.Version).toBeDefined();
+        expect(response.Id).toBeDefined();
+      }
+    );
 
     it.skipIf(!integrationConfig.useApiKey)('should include auth header in requests', async () => {
       await client.initWithApiKey(integrationConfig.apiKey);

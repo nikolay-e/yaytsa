@@ -26,7 +26,7 @@ export interface ServerConfig {
 
 export interface AuthPayload {
   Username: string;
-  Pw: string;  // Note: "Pw" not "Password" per Jellyfin API
+  Pw: string; // Note: "Pw" not "Password" per Jellyfin API
 }
 
 export interface AuthResponse {
@@ -416,7 +416,10 @@ export class AuthenticationError extends JellyfinError {
 }
 
 export class NetworkError extends JellyfinError {
-  constructor(message: string, public originalError?: Error) {
+  constructor(
+    message: string,
+    public originalError?: Error
+  ) {
     super(message);
     this.name = 'NetworkError';
   }

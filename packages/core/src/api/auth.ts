@@ -4,11 +4,7 @@
  */
 
 import { JellyfinClient } from './client.js';
-import {
-  AuthPayload,
-  AuthResponse,
-  AuthenticationError
-} from '../models/types.js';
+import { AuthPayload, AuthResponse, AuthenticationError } from '../models/types.js';
 
 export class AuthService {
   constructor(private client: JellyfinClient) {}
@@ -24,14 +20,11 @@ export class AuthService {
     // Build auth payload with correct field names
     const payload: AuthPayload = {
       Username: username,
-      Pw: password  // "Pw" not "Password" per Jellyfin API
+      Pw: password, // "Pw" not "Password" per Jellyfin API
     };
 
     try {
-      const response = await this.client.post<AuthResponse>(
-        '/Users/AuthenticateByName',
-        payload
-      );
+      const response = await this.client.post<AuthResponse>('/Users/AuthenticateByName', payload);
 
       // Store token and user ID in client
       this.client.setToken(response.AccessToken, response.User.Id);

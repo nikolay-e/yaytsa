@@ -10,11 +10,11 @@ const config = loadEnvironmentConfig();
 
 const serverUrl = config.jellyfinServerUrl || 'http://localhost:8096';
 
-// Require API key for all integration tests
+// API key is required for all integration tests
 if (!config.jellyfinApiKey) {
   throw new Error(
     'JELLYFIN_API_KEY is required for integration tests. ' +
-    'Please create a .env file with your API key.'
+      'Please create a .env file with your API key.'
   );
 }
 
@@ -32,10 +32,6 @@ export const integrationConfig = {
 
 console.log('\n🧪 Integration Test Configuration:');
 console.log(`  Server: ${integrationConfig.serverUrl}`);
-if (integrationConfig.apiKey) {
-  console.log(`  API Key: ${integrationConfig.apiKey.substring(0, 8)}...`);
-} else {
-  console.log(`  Username: ${integrationConfig.username}`);
-}
+console.log(`  API Key: ${integrationConfig.apiKey.substring(0, 8)}...`);
 console.log(`  Client: ${integrationConfig.clientName}`);
 console.log(`  Device: ${integrationConfig.deviceName}\n`);

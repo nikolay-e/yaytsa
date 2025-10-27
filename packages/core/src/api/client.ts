@@ -8,7 +8,7 @@ import {
   ServerConfig,
   JellyfinError,
   NetworkError,
-  AuthenticationError
+  AuthenticationError,
 } from '../models/types.js';
 
 export class JellyfinClient {
@@ -38,7 +38,7 @@ export class JellyfinClient {
       `MediaBrowser Client="${this.clientInfo.name}"`,
       `Device="${this.clientInfo.device}"`,
       `DeviceId="${this.clientInfo.deviceId}"`,
-      `Version="${this.clientInfo.version}"`
+      `Version="${this.clientInfo.version}"`,
     ];
 
     const authToken = token || this.token;
@@ -109,23 +109,20 @@ export class JellyfinClient {
     return {
       serverUrl: this.serverUrl,
       userId: this.userId || undefined,
-      token: this.token || undefined
+      token: this.token || undefined,
     };
   }
 
   /**
    * Make HTTP request to Jellyfin API
    */
-  async request<T = any>(
-    endpoint: string,
-    options: RequestInit = {}
-  ): Promise<T> {
+  async request<T = any>(endpoint: string, options: RequestInit = {}): Promise<T> {
     const url = `${this.serverUrl}${endpoint}`;
 
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
       'X-Emby-Authorization': this.buildAuthHeader(),
-      ...this.headersFromInit(options.headers)
+      ...this.headersFromInit(options.headers),
     };
 
     // Add token header if available
@@ -136,7 +133,7 @@ export class JellyfinClient {
     try {
       const response = await fetch(url, {
         ...options,
-        headers
+        headers,
       });
 
       // Handle non-OK responses
@@ -153,10 +150,7 @@ export class JellyfinClient {
         throw error;
       }
 
-      throw new NetworkError(
-        `Network request failed: ${(error as Error).message}`,
-        error as Error
-      );
+      throw new NetworkError(`Network request failed: ${(error as Error).message}`, error as Error);
     }
   }
 
@@ -199,18 +193,10 @@ export class JellyfinClient {
     const message = errorData?.message || response.statusText || 'Request failed';
 
     if (response.status === 401 || response.status === 403) {
-      throw new AuthenticationError(
-        message,
-        response.status,
-        errorData
-      );
+      throw new AuthenticationError(message, response.status, errorData);
     }
 
-    throw new JellyfinError(
-      message,
-      response.status,
-      errorData
-    );
+    throw new JellyfinError(message, response.status, errorData);
   }
 
   /**
@@ -246,7 +232,7 @@ export class JellyfinClient {
   async post<T = any>(endpoint: string, data?: any): Promise<T> {
     return this.request<T>(endpoint, {
       method: 'POST',
-      body: data ? JSON.stringify(data) : undefined
+      body: data ? JSON.stringify(data) : undefined,
     });
   }
 
@@ -287,11 +273,14 @@ export class JellyfinClient {
    * Build stream URL for audio playback
    * Note: Uses api_key query parameter as browsers don't send headers for <audio> src
    */
-  getStreamUrl(itemId: string, options?: {
-    audioCodec?: string;
-    maxStreamingBitrate?: string;
-    container?: string;
-  }): string {
+  getStreamUrl(
+    itemId: string,
+    options?: {
+      audioCodec?: string;
+      maxStreamingBitrate?: string;
+      container?: string;
+    }
+  ): string {
     if (!this.token) {
       throw new AuthenticationError('Cannot build stream URL: not authenticated');
     }
@@ -300,7 +289,7 @@ export class JellyfinClient {
       api_key: this.token,
       audioCodec: options?.audioCodec || 'aac,mp3,opus',
       maxStreamingBitrate: options?.maxStreamingBitrate || '320000',
-      container: options?.container || 'opus,mp3,aac,m4a,flac'
+      container: options?.container || 'opus,mp3,aac,m4a,flac',
     });
 
     return `${this.serverUrl}/Audio/${itemId}/stream?${params}`;

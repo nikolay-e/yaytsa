@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { PlaybackState } from '../src/player/state.js';
-import { JellyfinClient } from '../src/api/client.js';
-import { AudioItem } from '../src/models/types.js';
+import { PlaybackState } from '../../src/player/state.js';
+import { JellyfinClient } from '../../src/api/client.js';
+import { AudioItem } from '../../src/models/types.js';
 
 describe('PlaybackState', () => {
   let state: PlaybackState;
@@ -11,7 +11,7 @@ describe('PlaybackState', () => {
   beforeEach(() => {
     mockClient = {
       isAuthenticated: vi.fn(() => true),
-      post: vi.fn(() => Promise.resolve())
+      post: vi.fn(() => Promise.resolve()),
     } as any;
 
     state = new PlaybackState(mockClient);
@@ -21,7 +21,7 @@ describe('PlaybackState', () => {
       Name: 'Test Track',
       ServerId: 'test-server',
       Id: 'test-id',
-      RunTimeTicks: 1_800_000_000 // 3 minutes = 180 seconds (10M ticks/sec)
+      RunTimeTicks: 1_800_000_000, // 3 minutes = 180 seconds (10M ticks/sec)
     };
   });
 
@@ -178,7 +178,7 @@ describe('PlaybackState', () => {
           PositionTicks: 300_000_000,
           IsPaused: false,
           PlayMethod: 'DirectPlay',
-          CanSeek: true
+          CanSeek: true,
         })
       );
     });
@@ -191,7 +191,7 @@ describe('PlaybackState', () => {
         expect.objectContaining({
           ItemId: 'test-id',
           PositionTicks: 300_000_000,
-          IsPaused: false
+          IsPaused: false,
         })
       );
     });
@@ -204,7 +204,7 @@ describe('PlaybackState', () => {
       expect(mockClient.post).toHaveBeenCalledWith(
         '/Sessions/Playing/Progress',
         expect.objectContaining({
-          IsPaused: true
+          IsPaused: true,
         })
       );
     });
@@ -216,7 +216,7 @@ describe('PlaybackState', () => {
         '/Sessions/Playing/Stopped',
         expect.objectContaining({
           ItemId: 'test-id',
-          PositionTicks: 300_000_000
+          PositionTicks: 300_000_000,
         })
       );
     });

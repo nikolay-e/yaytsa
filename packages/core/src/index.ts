@@ -17,7 +17,7 @@ export {
   loadEnvironmentConfig,
   getRequiredConfig,
   getOrCreateDeviceId,
-  type EnvironmentConfig
+  type EnvironmentConfig,
 } from './config/env.js';
 
 // Types and models

@@ -21,7 +21,7 @@ export class PlaybackQueue {
       currentIndex: this.currentIndex,
       originalOrder: [...this.originalOrder],
       repeatMode: this.repeatMode,
-      shuffleMode: this.shuffleMode
+      shuffleMode: this.shuffleMode,
     };
   }
 
@@ -354,8 +354,10 @@ export class PlaybackQueue {
       const currentItemIndex = shuffled.findIndex(item => item.Id === currentItem.Id);
       if (currentItemIndex !== -1 && currentItemIndex !== this.currentIndex) {
         // Swap current item to current position
-        [shuffled[this.currentIndex], shuffled[currentItemIndex]] =
-        [shuffled[currentItemIndex], shuffled[this.currentIndex]];
+        [shuffled[this.currentIndex], shuffled[currentItemIndex]] = [
+          shuffled[currentItemIndex],
+          shuffled[this.currentIndex],
+        ];
       }
     }
 
@@ -398,8 +400,10 @@ export class PlaybackQueue {
    */
   moveItem(fromIndex: number, toIndex: number): boolean {
     if (
-      fromIndex < 0 || fromIndex >= this.items.length ||
-      toIndex < 0 || toIndex >= this.items.length ||
+      fromIndex < 0 ||
+      fromIndex >= this.items.length ||
+      toIndex < 0 ||
+      toIndex >= this.items.length ||
       fromIndex === toIndex
     ) {
       return false;

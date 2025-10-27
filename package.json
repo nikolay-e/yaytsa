@@ -3,6 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "description": "A portable music client for Jellyfin",
+  "workspaces": [
+    "packages/*"
+  ],
   "scripts": {
     "prepare": "command -v pre-commit > /dev/null && pre-commit install || echo 'pre-commit not installed, skipping hook setup'",
     "test": "cd packages/core && npm test",
@@ -13,7 +16,11 @@
     "type-check": "cd packages/core && npx tsc --noEmit",
     "pre-commit": "pre-commit run --all-files"
   },
-  "keywords": ["jellyfin", "music", "client"],
+  "keywords": [
+    "jellyfin",
+    "music",
+    "client"
+  ],
   "author": "",
   "license": "MIT",
   "devDependencies": {

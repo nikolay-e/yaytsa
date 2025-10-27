@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { PlaybackQueue } from '../src/player/queue.js';
-import { AudioItem } from '../src/models/types.js';
+import { PlaybackQueue } from '../../src/player/queue.js';
+import { AudioItem } from '../../src/models/types.js';
 
 describe('PlaybackQueue', () => {
   let queue: PlaybackQueue;
@@ -13,7 +13,7 @@ describe('PlaybackQueue', () => {
       createTestAudioItem('2', 'Track 2'),
       createTestAudioItem('3', 'Track 3'),
       createTestAudioItem('4', 'Track 4'),
-      createTestAudioItem('5', 'Track 5')
+      createTestAudioItem('5', 'Track 5'),
     ];
   });
 
@@ -305,6 +305,6 @@ function createTestAudioItem(id: string, name: string): AudioItem {
     Name: name,
     ServerId: 'test-server',
     Id: id,
-    RunTimeTicks: 180_000_000 // 3 minutes
+    RunTimeTicks: 180_000_000, // 3 minutes
   };
 }

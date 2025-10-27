@@ -2,15 +2,15 @@
 # See https://pre-commit.com for more information
 
 repos:
-  # General file checks
+  # General file checks (auto-fix enabled where possible)
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.5.0
     hooks:
       - id: trailing-whitespace
-        exclude: \.md$
+        args: [--markdown-linebreak-ext=md] # Auto-fix trailing whitespace, preserve MD line breaks
       - id: end-of-file-fixer
       - id: check-yaml
-        args: [--unsafe]  # Allow custom tags in docker-compose
+        args: [--unsafe] # Allow custom tags in docker-compose
       - id: check-added-large-files
         args: [--maxkb=1000]
       - id: check-json
@@ -19,8 +19,11 @@ repos:
       - id: detect-private-key
       - id: mixed-line-ending
         args: [--fix=lf]
+      - id: fix-byte-order-marker # Auto-remove UTF-8 BOM
+      - id: check-executables-have-shebangs
+      - id: check-shebang-scripts-are-executable
 
-  # TypeScript/JavaScript formatting
+  # TypeScript/JavaScript formatting (auto-fix with --write)
   - repo: https://github.com/pre-commit/mirrors-prettier
     rev: v3.1.0
     hooks:
@@ -32,7 +35,7 @@ repos:
             .*\.min\.js|
             jellyfin-api-spec\.json
           )$
-        args: [--write, --ignore-unknown]
+        args: [--write, --ignore-unknown, --log-level=warn]
 
   # TypeScript linting
   - repo: local
@@ -70,13 +73,3 @@ repos:
     hooks:
       - id: shellcheck
         args: [-x]
-
-  # Environment file validation
-  - repo: local
-    hooks:
-      - id: check-env-example
-        name: Check .env.example is up to date
-        entry: bash -c 'if [ -f .env.example ]; then echo "✓ .env.example exists"; else echo "✗ .env.example missing" && exit 1; fi'
-        language: system
-        pass_filenames: false
-        always_run: true
