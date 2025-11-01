@@ -1,0 +1,184 @@
+/**
+ * Playlists Module
+ * Handles creating and managing playlists
+ */
+
+import { JellyfinClient } from './client.js';
+import {
+  Playlist,
+  AudioItem,
+  ItemsResult,
+  CreatePlaylistDto,
+  AuthenticationError,
+} from '../models/types.js';
+
+export class PlaylistsService {
+  constructor(private client: JellyfinClient) {}
+
+  /**
+   * Create a new playlist
+   */
+  async createPlaylist(options: CreatePlaylistDto): Promise<Playlist> {
+    const userId = this.client.getUserId();
+    if (!userId) {
+      throw new AuthenticationError('Not authenticated');
+    }
+
+    // Build request body matching Jellyfin API schema
+    const body: any = {
+      Name: options.name,
+    };
+
+    if (options.itemIds && options.itemIds.length > 0) {
+      body.Ids = options.itemIds;
+    }
+
+    if (options.mediaType) {
+      body.MediaType = options.mediaType;
+    }
+
+    if (options.userId) {
+      body.UserId = options.userId;
+    } else {
+      body.UserId = userId;
+    }
+
+    if (options.isPublic !== undefined) {
+      body.IsPublic = options.isPublic;
+    }
+
+    const result = await this.client.post<{ Id: string }>('/Playlists', body);
+
+    return this.getPlaylist(result.Id);
+  }
+
+  /**
+   * Get playlist details by ID
+   */
+  async getPlaylist(playlistId: string): Promise<Playlist> {
+    const userId = this.client.getUserId();
+    if (!userId) {
+      throw new AuthenticationError('Not authenticated');
+    }
+
+    return this.client.get<Playlist>(`/Users/${userId}/Items/${playlistId}`);
+  }
+
+  /**
+   * Get items in a playlist
+   */
+  async getPlaylistItems(playlistId: string, options?: {
+    startIndex?: number;
+    limit?: number;
+  }): Promise<ItemsResult<AudioItem>> {
+    const userId = this.client.getUserId();
+    if (!userId) {
+      throw new AuthenticationError('Not authenticated');
+    }
+
+    const params: Record<string, any> = {
+      UserId: userId,
+    };
+
+    if (options?.startIndex !== undefined) {
+      params.StartIndex = options.startIndex;
+    }
+
+    if (options?.limit !== undefined) {
+      params.Limit = options.limit;
+    }
+
+    return this.client.get<ItemsResult<AudioItem>>(
+      `/Playlists/${playlistId}/Items`,
+      params
+    );
+  }
+
+  /**
+   * Add items to a playlist
+   */
+  async addItemsToPlaylist(
+    playlistId: string,
+    itemIds: string[]
+  ): Promise<void> {
+    const userId = this.client.getUserId();
+    if (!userId) {
+      throw new AuthenticationError('Not authenticated');
+    }
+
+    const idsParam = itemIds.join(',');
+    const url = `/Playlists/${playlistId}/Items?Ids=${encodeURIComponent(idsParam)}&UserId=${userId}`;
+
+    await this.client.post(url, undefined);
+  }
+
+  /**
+   * Remove items from a playlist
+   * @param entryIds The playlist entry IDs (not the original item IDs!)
+   */
+  async removeItemsFromPlaylist(
+    playlistId: string,
+    entryIds: string[]
+  ): Promise<void> {
+    const entryIdsParam = entryIds.join(',');
+    const url = `/Playlists/${playlistId}/Items?EntryIds=${encodeURIComponent(entryIdsParam)}`;
+
+    await this.client.delete(url);
+  }
+
+  /**
+   * Move/reorder an item in a playlist
+   * @param itemId The playlist entry ID (PlaylistItemId from getPlaylistItems)
+   * @param newIndex The new position index
+   */
+  async movePlaylistItem(
+    playlistId: string,
+    itemId: string,
+    newIndex: number
+  ): Promise<void> {
+    await this.client.post(
+      `/Playlists/${playlistId}/Items/${itemId}/Move/${newIndex}`
+    );
+  }
+
+  /**
+   * Delete a playlist
+   */
+  async deletePlaylist(playlistId: string): Promise<void> {
+    await this.client.delete(`/Items/${playlistId}`);
+  }
+
+  /**
+   * Get all playlists for the user
+   */
+  async getPlaylists(options?: {
+    startIndex?: number;
+    limit?: number;
+  }): Promise<ItemsResult<Playlist>> {
+    const userId = this.client.getUserId();
+    if (!userId) {
+      throw new AuthenticationError('Not authenticated');
+    }
+
+    const params: Record<string, any> = {
+      IncludeItemTypes: 'Playlist',
+      Recursive: true,
+      Fields: 'PrimaryImageAspectRatio,ChildCount',
+      SortBy: 'SortName',
+      SortOrder: 'Ascending',
+    };
+
+    if (options?.startIndex !== undefined) {
+      params.StartIndex = options.startIndex;
+    }
+
+    if (options?.limit !== undefined) {
+      params.Limit = options.limit;
+    }
+
+    return this.client.get<ItemsResult<Playlist>>(
+      `/Users/${userId}/Items`,
+      params
+    );
+  }
+}

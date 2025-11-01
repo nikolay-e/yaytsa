@@ -1,0 +1,72 @@
+# Dependencies
+node_modules
+npm-debug.log
+yarn-error.log
+package-lock.json
+yarn.lock
+
+# Build outputs
+packages/*/build
+packages/*/dist
+*.tsbuildinfo
+
+# Tests
+coverage
+.nyc_output
+packages/*/tests
+*.test.ts
+*.test.js
+*.spec.ts
+*.spec.js
+
+# Development
+.git
+.github
+.vscode
+.idea
+*.swp
+*.swo
+*~
+
+# Documentation
+*.md
+!packages/*/README.md
+docs
+
+# CI/CD
+.travis.yml
+.gitlab-ci.yml
+jenkins
+.circleci
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# Docker
+Dockerfile.dev
+docker-compose.yml
+docker-compose.*.yml
+.dockerignore
+
+# Kubernetes
+helm
+k8s
+
+# Misc
+.DS_Store
+*.log
+.cache
+.temp
+tmp
+
+# Pre-commit
+.pre-commit-config.yaml
+
+# Test media
+test-media
+
+# Integration tests
+run-integration-tests.sh
+vitest.integration.config.ts

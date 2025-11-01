@@ -1,75 +1,179 @@
-# Pre-commit hooks for code quality and consistency
-# See https://pre-commit.com for more information
-
 repos:
-  # General file checks (auto-fix enabled where possible)
+  # ------------------------------------------------------------------------------
+  # REPO 1: GENERAL FILE HYGIENE (Mostly Autofixing)
+  # Basic checks and fixes for all text files.
+  # ------------------------------------------------------------------------------
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.5.0
+    rev: v6.0.0
     hooks:
-      - id: trailing-whitespace
-        args: [--markdown-linebreak-ext=md] # Auto-fix trailing whitespace, preserve MD line breaks
-      - id: end-of-file-fixer
-      - id: check-yaml
-        args: [--unsafe] # Allow custom tags in docker-compose
-      - id: check-added-large-files
-        args: [--maxkb=1000]
-      - id: check-json
-      - id: check-merge-conflict
-      - id: check-case-conflict
-      - id: detect-private-key
-      - id: mixed-line-ending
+      - id: trailing-whitespace # [AUTOFIX] Removes trailing whitespace.
+        args: [--markdown-linebreak-ext=md]
+      - id: end-of-file-fixer # [AUTOFIX] Ensures files end with a newline.
+      - id: mixed-line-ending # [AUTOFIX] Forces LF line endings.
         args: [--fix=lf]
-      - id: fix-byte-order-marker # Auto-remove UTF-8 BOM
-      - id: check-executables-have-shebangs
-      - id: check-shebang-scripts-are-executable
+      - id: fix-byte-order-marker # [AUTOFIX] Removes UTF-8 BOM.
+      - id: check-added-large-files # [CHECK] Prevents committing large files (>1MB).
+        args: [--maxkb=1024]
+      - id: check-merge-conflict # [CHECK] Prevents committing merge conflict markers.
+      - id: check-case-conflict # [CHECK] Catches file path case inconsistencies.
+      - id: detect-private-key # [CHECK] Prevents leaking private keys.
+      - id: check-yaml # [CHECK] Validates YAML syntax.
+        args: [--unsafe] # Specific to this project: Allows custom Docker Compose tags.
+        exclude: ^helm/.*/templates/.*\.yaml$ # Exclude Helm templates (use Go templating)
 
-  # TypeScript/JavaScript formatting (auto-fix with --write)
+  # ------------------------------------------------------------------------------
+  # REPO 2: PRETTIER CODE FORMATTER (Autofixing)
+  # The main formatter for TS, Svelte, YAML, MD, and CSS.
+  # Uses the project's existing .prettierrc file.
+  # ------------------------------------------------------------------------------
   - repo: https://github.com/pre-commit/mirrors-prettier
-    rev: v3.1.0
+    rev: v4.0.0-alpha.8 # Using a version that better supports Svelte
     hooks:
       - id: prettier
-        types_or: [javascript, jsx, ts, tsx, json, yaml, markdown]
-        exclude: |
-          (?x)^(
-            package-lock\.json|
-            .*\.min\.js|
-            jellyfin-api-spec\.json
-          )$
-        args: [--write, --ignore-unknown, --log-level=warn]
+        types_or: [javascript, svelte, css, scss, markdown, yaml, json]
+        args: [--write, --ignore-unknown]
+        # Exclusions are managed by your existing .prettierignore file.
 
-  # TypeScript linting
-  - repo: local
-    hooks:
-      - id: tsc
-        name: TypeScript type check
-        entry: bash -c 'cd packages/core && npx tsc --noEmit'
-        language: system
-        files: \.ts$
-        pass_filenames: false
-
-      - id: vitest-unit
-        name: Run unit tests
-        entry: bash -c 'cd packages/core && npm test'
-        language: system
-        files: \.(ts|js)$
-        pass_filenames: false
-        stages: [pre-push]
-
-  # Markdown linting
+  # ------------------------------------------------------------------------------
+  # REPO 3: MARKDOWN LINTING (Autofixing)
+  # Lints and fixes Markdown files using your existing .markdownlint.yaml config.
+  # ------------------------------------------------------------------------------
   - repo: https://github.com/igorshubovych/markdownlint-cli
-    rev: v0.39.0
+    rev: v0.45.0
     hooks:
       - id: markdownlint
-        args: [--fix]
-        exclude: |
-          (?x)^(
-            node_modules/|
-            jellyfin-api-spec\.json
-          )$
+        args: [--fix, --config, .markdownlint.yaml]
 
-  # Shell script linting
-  - repo: https://github.com/shellcheck-py/shellcheck-py
-    rev: v0.9.0.6
+  # ------------------------------------------------------------------------------
+  # REPO 4: SHELL SCRIPT FORMATTING & LINTING (Autofixing + Check)
+  # Specific to this project: docker-entrypoint.sh, run-integration-tests.sh, etc.
+  # ------------------------------------------------------------------------------
+  - repo: https://github.com/scop/pre-commit-shfmt
+    rev: v3.12.0-2
     hooks:
-      - id: shellcheck
+      - id: shfmt # [AUTOFIX] Formats shell scripts for consistency.
+        args: [-w, -i, '2'] # -w: write changes, -i 2: indent with 2 spaces.
+
+  - repo: https://github.com/shellcheck-py/shellcheck-py
+    rev: v0.11.0.1
+    hooks:
+      - id: shellcheck # [CHECK] Lints shell scripts for common errors.
         args: [-x]
+
+  # ------------------------------------------------------------------------------
+  # REPO 5: DOCKER & INFRASTRUCTURE LINTING (Quality & Security)
+  # Validates Dockerfiles, docker-compose, and infrastructure config.
+  # ------------------------------------------------------------------------------
+  - repo: https://github.com/hadolint/hadolint
+    rev: v2.14.0
+    hooks:
+      - id: hadolint-docker # [CHECK] Dockerfile best practices and security linting.
+        args: [--config, .hadolint.yaml]
+
+  # ------------------------------------------------------------------------------
+  # REPO 6: SECRET DETECTION (Security)
+  # Prevents committing secrets, API keys, tokens, and credentials.
+  # ------------------------------------------------------------------------------
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.28.0
+    hooks:
+      - id: gitleaks # [CHECK] Scans for hardcoded secrets and credentials.
+
+  # ------------------------------------------------------------------------------
+  # REPO 7: GITHUB ACTIONS VALIDATION (CI/CD Quality)
+  # Validates GitHub Actions workflow syntax and best practices.
+  # ------------------------------------------------------------------------------
+  - repo: https://github.com/rhysd/actionlint
+    rev: v1.7.8
+    hooks:
+      - id: actionlint-docker # [CHECK] Lints GitHub Actions workflow files.
+
+  # ------------------------------------------------------------------------------
+  # REPO 8: CSS QUALITY (Stylelint)
+  # Validates CSS in .css files and Svelte components.
+  # ------------------------------------------------------------------------------
+  - repo: https://github.com/thibaudcolas/pre-commit-stylelint
+    rev: v16.25.0
+    hooks:
+      - id: stylelint # [CHECK/AUTOFIX] CSS quality and consistency.
+        args: [--fix, --config, .stylelintrc.json]
+        additional_dependencies:
+          - stylelint@16.12.0
+          - stylelint-config-standard@36.0.1
+          - stylelint-config-recommended@14.0.1
+
+  # ------------------------------------------------------------------------------
+  # REPO 9: LOCAL HOOKS (Project-Specific Scripts)
+  # Autofixing and critical checks tailored to the NPM workspace setup.
+  # ------------------------------------------------------------------------------
+  - repo: local
+    hooks:
+      # [AUTOFIX] Sorts package.json to keep scripts and dependencies in a clean, consistent order.
+      - id: sort-package-json
+        name: 'Sort package.json files'
+        entry: npx sort-package-json "package.json" "packages/*/package.json"
+        language: node
+        types: [json]
+        files: '^(package\.json|packages/.*/package\.json)$'
+
+      # [CHECK] TypeScript type-check for the framework-agnostic core library.
+      # Runs only on push to avoid slowing down local commits.
+      - id: tsc-core
+        name: 'TypeScript type check (core)'
+        entry: npm run type-check # This runs `npx tsc --noEmit` inside packages/core
+        language: node
+        pass_filenames: false
+
+      - id: svelte-check
+        name: 'Svelte type check (web)'
+        entry: bash -c 'npm run build:core && npm run build:platform && npm run check --workspace=@jellyfin-mini/web'
+        language: system
+        pass_filenames: false
+
+      # [CHECK] Helm chart validation
+      - id: helm-lint
+        name: 'Helm lint (chart validation)'
+        entry: helm lint helm/jellyfin-miniclient
+        language: system
+        files: ^helm/.*\.(yaml|yml|tpl)$
+        pass_filenames: false
+
+      # [CHECK] ESLint - TypeScript/JavaScript static analysis
+      - id: eslint
+        name: 'ESLint (TypeScript/Svelte quality)'
+        entry: npx eslint --fix --max-warnings=-1
+        language: node
+        files: ^packages/.*\.(js|ts|svelte)$
+        pass_filenames: true
+
+      # [CHECK] Docker Compose validation
+      - id: docker-compose-check
+        name: 'Docker Compose config validation'
+        entry: docker compose -f docker-compose.yml config -q
+        language: system
+        files: ^docker-compose\.yml$
+        pass_filenames: false
+
+      # [CHECK] Nginx config validation
+      - id: nginx-test
+        name: 'Nginx config syntax validation'
+        entry: docker run --rm -v ./nginx.conf:/etc/nginx/nginx.conf:ro nginx:1.27-alpine nginx -t
+        language: system
+        files: ^nginx\.conf$
+        pass_filenames: false
+
+      # [SECURITY] npm audit - Check for security vulnerabilities in production dependencies
+      - id: npm-audit
+        name: 'npm audit (production security vulnerabilities)'
+        entry: npm audit --audit-level=high --production
+        language: node
+        files: ^package(-lock)?\.json$
+        pass_filenames: false
+
+      # [CHECK] Validate .env.example has server URL variable
+      - id: env-example-check
+        name: 'Validate .env.example completeness'
+        entry: bash -c 'grep -q "JELLYFIN_SERVER_URL" .env.example'
+        language: system
+        files: ^\.env\.example$
+        pass_filenames: false

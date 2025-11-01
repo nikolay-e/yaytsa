@@ -2,6 +2,8 @@
 node_modules/
 .pnpm-store/
 
+*api-spec.json
+
 # Build outputs
 dist/
 build/
@@ -16,9 +18,11 @@ build/
 # IDE
 .vscode/
 .idea/
+.claude/
 *.swp
 *.swo
 *~
+*.tmp
 
 # OS
 .DS_Store
@@ -35,3 +39,6 @@ coverage/
 # Temporary
 .tmp/
 temp/
+tree.tmp
+# SSL Certificates (auto-generated)
+*.pem

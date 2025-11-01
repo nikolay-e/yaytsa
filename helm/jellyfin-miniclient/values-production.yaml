@@ -1,0 +1,47 @@
+# Production environment values
+# Usage: helm install jellyfin-miniclient ./helm/jellyfin-miniclient -f helm/jellyfin-miniclient/values-production.yaml
+# Note: This file only overrides values that differ from values.yaml
+
+image:
+  repository: ghcr.io/nikolay-e/jellyfin-miniclient
+  pullPolicy: Always
+  # Tag will be set by CI/CD pipeline
+  tag: 'latest'
+
+imagePullSecrets:
+  - name: ghcr-secret
+
+config:
+  # Production server URL (overrides default empty string)
+  jellyfinServerUrl: 'https://media.nikolay-eremeev.com'
+  # clientName and deviceName inherit from values.yaml
+
+ingress:
+  enabled: true
+  className: traefik
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    # Listen on both HTTP and HTTPS, redirect HTTP to HTTPS
+    traefik.ingress.kubernetes.io/router.entrypoints: web,websecure
+    traefik.ingress.kubernetes.io/router.tls: 'true'
+    # Redirect all HTTP traffic to HTTPS permanently
+    traefik.ingress.kubernetes.io/redirect-entry-point: https
+    traefik.ingress.kubernetes.io/redirect-permanent: 'true'
+  hosts:
+    - host: jellyfin-mini.nikolay-eremeev.com
+      paths:
+        - path: /
+          pathType: Prefix
+        - path: /health
+          pathType: Prefix
+  tls: true
+
+replicaCount: 2
+# resources inherit from values.yaml
+
+# Optional: enable autoscaling in production
+# autoscaling:
+#   enabled: true
+#   minReplicas: 2
+#   maxReplicas: 5
+#   targetCPUUtilizationPercentage: 80
