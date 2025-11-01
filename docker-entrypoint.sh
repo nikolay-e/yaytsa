@@ -105,7 +105,8 @@ else
 fi
 
 # Generate nginx.conf from template with CSP hash substitution
-sed "s/__CSP_SCRIPT_HASHES__/$CSP_HASHES/g" /etc/nginx/nginx.conf.template >/var/cache/nginx/nginx.conf
+# Use '#' as delimiter instead of '/' to avoid conflicts with slashes in base64 hashes
+sed "s#__CSP_SCRIPT_HASHES__#$CSP_HASHES#g" /etc/nginx/nginx.conf.template >/var/cache/nginx/nginx.conf
 echo "Generated nginx.conf with runtime CSP hashes"
 
 # Execute the main command (nginx) with generated config
