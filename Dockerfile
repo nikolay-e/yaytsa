@@ -45,8 +45,8 @@ RUN npm run build
 # ============================================
 FROM nginx:1.27-alpine AS production
 
-# Copy custom nginx configuration
-COPY nginx.conf /etc/nginx/nginx.conf
+# Copy nginx configuration template (will be populated at runtime)
+COPY nginx.conf.template /etc/nginx/nginx.conf.template
 
 # Copy built static files from builder stage
 COPY --from=builder /app/packages/web/build /usr/share/nginx/html
@@ -55,7 +55,7 @@ COPY --from=builder /app/packages/web/build /usr/share/nginx/html
 COPY docker-entrypoint.sh /docker-entrypoint.sh
 
 # Install utilities, setup nginx, and configure permissions
-RUN apk add --no-cache bash wget jq && \
+RUN apk add --no-cache bash wget jq openssl && \
     rm -rf /etc/nginx/nginx.conf.default /usr/share/nginx/html/.gitkeep && \
     chmod +x /docker-entrypoint.sh && \
     mkdir -p /var/cache/nginx /var/run && \
@@ -72,6 +72,5 @@ EXPOSE 80
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
     CMD wget --quiet --tries=1 --spider http://localhost/health || exit 1
 
-# Set entrypoint and command
+# Set entrypoint (nginx started by entrypoint script with generated config)
 ENTRYPOINT ["/docker-entrypoint.sh"]
-CMD ["nginx", "-g", "daemon off;"]

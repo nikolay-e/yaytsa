@@ -61,5 +61,37 @@ EOF
 echo "Generated runtime config (sanitized for security):"
 cat /var/cache/nginx/config.json
 
-# Execute the main command (nginx)
-exec "$@"
+# Generate nginx.conf with CSP hashes computed from index.html
+# Extract all inline scripts and compute their SHA-256 hashes
+INDEX_HTML="/usr/share/nginx/html/index.html"
+if [ -f "$INDEX_HTML" ]; then
+  echo "Computing CSP hashes for inline scripts..."
+
+  # Extract inline scripts between <script> tags (excluding src= scripts)
+  # Then compute SHA-256 hash for each script and format as 'sha256-hash'
+  CSP_HASHES=$(sed -n 's/.*<script>\(.*\)<\/script>.*/\1/p' "$INDEX_HTML" |
+    while IFS= read -r script; do
+      if [ -n "$script" ]; then
+        printf '%s' "$script" | openssl dgst -sha256 -binary | openssl base64 |
+          awk '{printf "'\''sha256-%s'\'' ", $0}'
+      fi
+    done | sed 's/ $//') # Remove trailing space
+
+  if [ -z "$CSP_HASHES" ]; then
+    echo "WARNING: No inline scripts found in index.html, using 'self' only"
+    CSP_HASHES="'self'"
+  else
+    echo "Computed CSP hashes: $CSP_HASHES"
+    CSP_HASHES="'self' $CSP_HASHES"
+  fi
+else
+  echo "WARNING: index.html not found, using 'self' for CSP"
+  CSP_HASHES="'self'"
+fi
+
+# Generate nginx.conf from template with CSP hash substitution
+sed "s/__CSP_SCRIPT_HASHES__/$CSP_HASHES/g" /etc/nginx/nginx.conf.template >/var/cache/nginx/nginx.conf
+echo "Generated nginx.conf with runtime CSP hashes"
+
+# Execute the main command (nginx) with generated config
+exec nginx -c /var/cache/nginx/nginx.conf -g "daemon off;"
