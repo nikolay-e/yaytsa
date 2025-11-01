@@ -81,16 +81,26 @@ const albums = await client.get<ItemsResult>(`/Users/${userId}/Items`, {
 function getStreamUrl(itemId: string, config: StreamConfig): string {
   const params = new URLSearchParams({
     api_key: config.token, // Query param required for media
+    deviceId: config.deviceId, // Required for session tracking
     audioCodec: 'aac,mp3,opus',
-    maxStreamingBitrate: '320000',
     container: 'opus,mp3,aac,m4a,flac',
+    static: 'true', // Direct streaming (no transcoding)
   });
+
+  // Alternatively, use audioBitRate for transcoding:
+  // audioBitRate: '320000' (integer, not string)
 
   return `${config.serverUrl}/Audio/${itemId}/stream?${params}`;
 }
 ```
 
-**Why api_key in URL:** Browsers don't send custom headers for `<audio>` src attributes. Query parameter authentication is required.
+**Critical Parameters:**
+
+- `api_key` in URL: Browsers don't send custom headers for `<audio>` src attributes
+- `deviceId`: Required for proper session tracking in Jellyfin
+- `static=true`: Direct streaming without transcoding (faster, lower server load)
+- `audioBitRate`: Use instead of `static` for transcoding (e.g., `320000` for 320kbps)
+- **Never use** `maxStreamingBitrate` - causes HTTP 500 errors
 
 ### Playback Reporting (Ticks Conversion)
 
@@ -403,7 +413,7 @@ const config: CapacitorConfig = {
 
 ## Implementation Phases
 
-**Week 1: Core**
+### Week 1: Core
 
 - [ ] Jellyfin API client with auth
 - [ ] Items queries (albums, artists, tracks)
@@ -412,21 +422,21 @@ const config: CapacitorConfig = {
 - [ ] Ensure the tests and build are passing in ci.yml
 - [ ] Create pre-commit and add to ci
 
-**Week 2: Web UI**
+### Week 2: Web UI
 
 - [ ] Login with server validation
 - [ ] Library navigation
 - [ ] Search
 - [ ] Audio engine adapter
 
-**Week 3: Playback**
+### Week 3: Playback
 
 - [ ] Player bar
 - [ ] Queue UI and controls
 - [ ] Progress reporting
 - [ ] Keyboard shortcuts
 
-**Week 4: Polish**
+### Week 4: Polish
 
 - [ ] Code splitting
 - [ ] PWA manifest and service worker

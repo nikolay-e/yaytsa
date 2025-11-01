@@ -135,6 +135,7 @@ export interface PlayState {
 // ============================================================================
 
 export type ItemType = 'Audio' | 'MusicAlbum' | 'MusicArtist' | 'Playlist';
+export type MediaType = 'Unknown' | 'Video' | 'Audio' | 'Photo' | 'Book';
 
 export interface BaseItem {
   Name: string;
@@ -174,6 +175,7 @@ export interface AudioItem extends BaseItem {
   Artists?: string[];
   ArtistItems?: NameIdPair[];
   MediaSources?: MediaSourceInfo[];
+  PlaylistItemId?: string; // Present when item is from a playlist query
 }
 
 export interface MusicAlbum extends BaseItem {
@@ -185,6 +187,13 @@ export interface MusicAlbum extends BaseItem {
 
 export interface MusicArtist extends BaseItem {
   Type: 'MusicArtist';
+  ChildCount?: number;
+}
+
+export interface Playlist extends BaseItem {
+  Type: 'Playlist';
+  MediaType?: string;
+  IsFolder?: boolean;
   ChildCount?: number;
 }
 
@@ -323,12 +332,25 @@ export interface ItemsQuery {
   ArtistIds?: string[];
   AlbumIds?: string[];
   GenreIds?: string[];
+  IsFavorite?: boolean;
 }
 
 export interface ItemsResult<T = BaseItem> {
   Items: T[];
   TotalRecordCount: number;
   StartIndex: number;
+}
+
+// ============================================================================
+// Playlist Types
+// ============================================================================
+
+export interface CreatePlaylistDto {
+  name: string;
+  mediaType?: MediaType;
+  itemIds?: string[];
+  userId?: string;
+  isPublic?: boolean;
 }
 
 // ============================================================================

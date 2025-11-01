@@ -1,21 +1,45 @@
 services:
-  # Integration test runner against external Jellyfin server
-  integration-tests:
+  # Development service - Vite dev server with hot reload
+  dev:
     build:
       context: .
       dockerfile: Dockerfile
+      target: development
+    environment:
+      - VITE_JELLYFIN_SERVER_URL=${JELLYFIN_SERVER_URL}
+      - VITE_JELLYFIN_CLIENT_NAME=${JELLYFIN_CLIENT_NAME:-Jellyfin Mini Client}
+      - VITE_JELLYFIN_DEVICE_NAME=${JELLYFIN_DEVICE_NAME:-Docker Dev}
+    ports:
+      - '5173:5173'
+    volumes:
+      # Mount source directories for hot reload
+      - ./packages/core/src:/app/packages/core/src
+      - ./packages/platform/src:/app/packages/platform/src
+      - ./packages/web/src:/app/packages/web/src
+      - ./packages/web/static:/app/packages/web/static
+      # Preserve node_modules and dist directories in container
+      - /app/node_modules
+      - /app/packages/core/node_modules
+      - /app/packages/platform/node_modules
+      - /app/packages/web/node_modules
+      - /app/packages/core/dist
+      - /app/packages/platform/dist
+    working_dir: /app
+    command: sh -c "npm run build:core && npm run build:platform && cd packages/web && npm run dev -- --host 0.0.0.0"
+    profiles:
+      - dev
+
+  # Production service - Nginx with runtime config injection
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: production
     environment:
       - JELLYFIN_SERVER_URL=${JELLYFIN_SERVER_URL}
-      - JELLYFIN_API_KEY=${JELLYFIN_API_KEY}
       - JELLYFIN_CLIENT_NAME=${JELLYFIN_CLIENT_NAME:-Jellyfin Mini Client}
-      - JELLYFIN_DEVICE_NAME=${JELLYFIN_DEVICE_NAME:-Docker Test Runner}
-      - NODE_ENV=test
-    volumes:
-      - ./packages/core:/app/packages/core
-      - test_node_modules:/app/packages/core/node_modules
-    working_dir: /app/packages/core
-    command: npm run test:integration
-    network_mode: host
-
-volumes:
-  test_node_modules:
+      - JELLYFIN_DEVICE_NAME=${JELLYFIN_DEVICE_NAME:-Docker Web}
+    ports:
+      - '8080:80'
+    profiles:
+      - production

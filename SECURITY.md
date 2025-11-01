@@ -2,36 +2,117 @@
 
 ## Supported Versions
 
-This project is in early development. Security updates will be applied to the latest version only.
-
 | Version | Supported          |
 | ------- | ------------------ |
-| main    | :white_check_mark: |
+| 0.1.x   | :white_check_mark: |
 
 ## Reporting a Vulnerability
 
-If you discover a security vulnerability, please report it by:
+**Please do NOT open public GitHub issues for security vulnerabilities.**
 
-1. **DO NOT** open a public issue
-2. Email the maintainers privately or use GitHub's private vulnerability reporting
-3. Include:
+If you discover a security vulnerability in this project, please report it responsibly:
+
+### How to Report
+
+1. **Email**: Send a detailed report to the project maintainer (see repository owner)
+2. **Include**:
    - Description of the vulnerability
-   - Steps to reproduce
+   - Steps to reproduce the issue
    - Potential impact
    - Suggested fix (if any)
+   - Your contact information
 
-We will respond within 48 hours and work on a fix as soon as possible.
+### What to Expect
 
-## Security Considerations
+- **Initial Response**: Within 48 hours of your report
+- **Status Update**: Within 7 days with our assessment
+- **Fix Timeline**: Depends on severity
+  - Critical: Within 7 days
+  - High: Within 14 days
+  - Medium: Within 30 days
+  - Low: Next release cycle
 
-This client connects to Jellyfin servers and handles authentication tokens. Key security practices:
+### Security Best Practices
 
-- HTTPS enforced for production (localhost HTTP allowed in dev)
-- Tokens stored in sessionStorage (cleared on tab close)
-- No credentials stored in localStorage
-- Secret scanning enabled in repository
-- Dependabot security updates enabled
+When deploying this application:
 
-## Dependencies
+1. **Never commit secrets** to git
+   - Use `.env.example` as a template
+   - Keep `.env` files in `.gitignore`
+   - Rotate exposed API keys immediately
 
-We use Dependabot to automatically monitor and update dependencies with known vulnerabilities. Security updates are prioritized and merged quickly.
+2. **Always use HTTPS** in production
+   - HTTP is only acceptable for localhost development
+   - Enable HSTS headers (configured in nginx)
+
+3. **Secure environment variables**
+   - Use Kubernetes secrets or similar secret management
+   - Never hardcode credentials in Helm values
+   - Validate all environment inputs
+
+4. **Keep dependencies updated**
+   - Run `npm audit` regularly
+   - Update dependencies when security patches are available
+   - Monitor security advisories
+
+5. **Rate limiting**
+   - Configure rate limiting on authentication endpoints
+   - Use a reverse proxy or API gateway for additional protection
+
+6. **Network security**
+   - Use network policies in Kubernetes
+   - Restrict ingress/egress as needed
+   - Enable TLS everywhere
+
+## Security Features
+
+This application implements several security best practices:
+
+- ✅ **Docker Security**: Non-root user, read-only filesystem, minimal base image
+- ✅ **CSP Headers**: Content Security Policy to prevent XSS
+- ✅ **HSTS**: HTTP Strict Transport Security for HTTPS enforcement
+- ✅ **Secure Random**: Cryptographically secure device ID generation
+- ✅ **Input Validation**: Environment variable validation in Docker entrypoint
+- ✅ **Cache Security**: Sensitive endpoints excluded from service worker cache
+- ✅ **Session Management**: sessionStorage with cleanup on logout
+
+## Known Security Considerations
+
+### Dependency Vulnerabilities
+
+Current dependencies have some known vulnerabilities:
+
+- **cookie** (<0.7.0): Out of bounds character vulnerability (Low impact - development only)
+- **esbuild** (<=0.24.2): SSRF in development server (Low impact - development only)
+
+These require breaking changes to fix and are marked for the next major version.
+
+### Token Storage
+
+Authentication tokens are stored in `sessionStorage` (cleared on browser close). While this provides reasonable security:
+
+- **Risk**: Vulnerable to XSS if an XSS vulnerability exists elsewhere
+- **Mitigation**: Strong CSP headers are in place to prevent XSS
+- **Alternative**: Consider migrating to HttpOnly cookies in the future
+
+## Security Updates
+
+Security updates will be released as:
+
+- **Patch releases** (0.1.x) for critical and high severity issues
+- **Minor releases** (0.x.0) for security improvements requiring minor breaking changes
+- **Major releases** (x.0.0) for security improvements requiring major refactoring
+
+## Acknowledgments
+
+We appreciate responsible disclosure and will acknowledge security researchers who help improve this project's security posture.
+
+## Additional Resources
+
+- [OWASP Top 10](https://owasp.org/www-project-top-ten/)
+- [CIS Docker Benchmark](https://www.cisecurity.org/benchmark/docker)
+- [Kubernetes Security Best Practices](https://kubernetes.io/docs/concepts/security/security-best-practices/)
+
+---
+
+**Last Updated**: 2025-11-01

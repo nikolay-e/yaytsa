@@ -1,0 +1,67 @@
+<script lang="ts">
+  import type { MusicAlbum } from '@jellyfin-mini/core';
+  import AlbumCard from './AlbumCard.svelte';
+
+  export let albums: MusicAlbum[] = [];
+  export let loading: boolean = false;
+</script>
+
+<div class="album-grid-container">
+  {#if loading}
+    <div class="loading">Loading albums...</div>
+  {:else if albums.length === 0}
+    <div class="empty">
+      <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 14.5c-2.49 0-4.5-2.01-4.5-4.5S9.51 7.5 12 7.5s4.5 2.01 4.5 4.5-2.01 4.5-4.5 4.5zm0-5.5c-.55 0-1 .45-1 1s.45 1 1 1 1-.45 1-1-.45-1-1-1z" />
+      </svg>
+      <p>No albums found</p>
+    </div>
+  {:else}
+    <div class="album-grid">
+      {#each albums as album (album.Id)}
+        <AlbumCard {album} />
+      {/each}
+    </div>
+  {/if}
+</div>
+
+<style>
+  .album-grid-container {
+    width: 100%;
+  }
+
+  .album-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: var(--spacing-md);
+  }
+
+  .loading,
+  .empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-md);
+    padding: var(--spacing-xl);
+    color: var(--color-text-secondary);
+    text-align: center;
+  }
+
+  .empty svg {
+    opacity: 0.5;
+  }
+
+  @media (max-width: 768px) {
+    .album-grid {
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: var(--spacing-sm);
+    }
+  }
+
+  @media (min-width: 1400px) {
+    .album-grid {
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    }
+  }
+</style>

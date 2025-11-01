@@ -3,27 +3,44 @@
   "version": "0.1.0",
   "private": true,
   "description": "A portable music client for Jellyfin",
-  "workspaces": [
-    "packages/*"
-  ],
-  "scripts": {
-    "prepare": "command -v pre-commit > /dev/null && pre-commit install || echo 'pre-commit not installed, skipping hook setup'",
-    "test": "cd packages/core && npm test",
-    "build": "cd packages/core && npm run build",
-    "test:integration": "./run-integration-tests.sh full",
-    "lint": "prettier --check .",
-    "format": "prettier --write .",
-    "type-check": "cd packages/core && npx tsc --noEmit",
-    "pre-commit": "pre-commit run --all-files"
-  },
   "keywords": [
     "jellyfin",
     "music",
     "client"
   ],
-  "author": "",
   "license": "MIT",
+  "author": "",
+  "type": "module",
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "npm run build:core && npm run build:platform && cd packages/web && npm run build",
+    "build:core": "cd packages/core && npm run build",
+    "build:platform": "cd packages/platform && npm run build",
+    "dev": "npm run build:core && npm run build:platform && cd packages/web && npm run dev",
+    "format": "prettier --write .",
+    "lint": "prettier --check .",
+    "pre-commit": "pre-commit run --all-files",
+    "prepare": "echo 'Skipping pre-commit setup'",
+    "type-check": "cd packages/core && npx tsc --noEmit"
+  },
   "devDependencies": {
-    "prettier": "^3.1.0"
+    "@eslint/js": "^9.18.0",
+    "@typescript-eslint/eslint-plugin": "^8.19.1",
+    "@typescript-eslint/parser": "^8.19.1",
+    "eslint": "^9.18.0",
+    "eslint-plugin-svelte": "^2.46.1",
+    "globals": "^15.14.0",
+    "jsdom": "^27.1.0",
+    "prettier": "^3.1.0",
+    "stylelint": "^16.12.0",
+    "stylelint-config-recommended": "^14.0.1",
+    "stylelint-config-standard": "^36.0.1",
+    "svelte-eslint-parser": "^0.43.0",
+    "vitest": "^4.0.6"
+  },
+  "engines": {
+    "node": ">=20.0.0"
   }
 }

@@ -40,6 +40,7 @@ export class ItemsService {
     if (query.ArtistIds) params.ArtistIds = query.ArtistIds.join(',');
     if (query.AlbumIds) params.AlbumIds = query.AlbumIds.join(',');
     if (query.GenreIds) params.GenreIds = query.GenreIds.join(',');
+    if (query.IsFavorite !== undefined) params.IsFavorite = query.IsFavorite;
 
     // Fields to include in response
     if (query.Fields && query.Fields.length > 0) {
@@ -60,6 +61,7 @@ export class ItemsService {
     startIndex?: number;
     limit?: number;
     searchTerm?: string;
+    isFavorite?: boolean;
   }): Promise<ItemsResult<MusicAlbum>> {
     const query: ItemsQuery = {
       IncludeItemTypes: 'MusicAlbum',
@@ -70,6 +72,7 @@ export class ItemsService {
       StartIndex: options?.startIndex,
       Limit: options?.limit,
       SearchTerm: options?.searchTerm,
+      IsFavorite: options?.isFavorite,
     };
 
     if (options?.parentId) {
@@ -94,6 +97,7 @@ export class ItemsService {
     startIndex?: number;
     limit?: number;
     searchTerm?: string;
+    isFavorite?: boolean;
   }): Promise<ItemsResult<MusicArtist>> {
     const query: ItemsQuery = {
       IncludeItemTypes: 'MusicArtist',
@@ -104,6 +108,7 @@ export class ItemsService {
       StartIndex: options?.startIndex,
       Limit: options?.limit,
       SearchTerm: options?.searchTerm,
+      IsFavorite: options?.isFavorite,
     };
 
     return this.queryItems<MusicArtist>(query);
@@ -120,6 +125,7 @@ export class ItemsService {
     startIndex?: number;
     limit?: number;
     searchTerm?: string;
+    isFavorite?: boolean;
   }): Promise<ItemsResult<AudioItem>> {
     const query: ItemsQuery = {
       IncludeItemTypes: 'Audio',
@@ -138,6 +144,7 @@ export class ItemsService {
       StartIndex: options?.startIndex,
       Limit: options?.limit,
       SearchTerm: options?.searchTerm,
+      IsFavorite: options?.isFavorite,
     };
 
     if (options?.parentId) {
@@ -214,12 +221,11 @@ export class ItemsService {
   /**
    * Get recently added albums
    */
-  async getRecentAlbums(limit: number = 20): Promise<MusicAlbum[]> {
-    const result = await this.getAlbums({
+  async getRecentAlbums(limit: number = 20): Promise<ItemsResult<MusicAlbum>> {
+    return this.getAlbums({
       sortBy: 'DateCreated',
       limit,
     });
-    return result.Items;
   }
 
   /**

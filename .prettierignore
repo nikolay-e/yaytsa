@@ -22,3 +22,6 @@ jellyfin-api-spec.json
 package-lock.json
 pnpm-lock.yaml
 yarn.lock
+
+# Helm templates (use Go templating, not pure YAML)
+helm/**/templates/**

@@ -1,19 +1,21 @@
 {
   "name": "@jellyfin-mini/core",
+  "version": "0.1.0",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "scripts": {
     "build": "tsc",
     "test": "vitest run",
-    "test:watch": "vitest",
-    "test:coverage": "vitest run --coverage",
-    "test:integration": "vitest run --config vitest.integration.config.ts"
+    "test:e2e": "vitest run tests/e2e",
+    "test:watch": "vitest"
   },
   "devDependencies": {
     "@types/node": "^20.10.0",
     "@vitest/coverage-v8": "^1.0.4",
+    "@vitest/ui": "^1.6.1",
+    "dotenv": "^17.2.3",
     "typescript": "^5.3.3",
-    "vitest": "^1.0.4"
+    "vitest": "^1.6.1"
   }
 }

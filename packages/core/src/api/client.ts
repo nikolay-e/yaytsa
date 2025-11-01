@@ -60,27 +60,6 @@ export class JellyfinClient {
   }
 
   /**
-   * Initialize client with API key (fetches user ID automatically)
-   */
-  async initWithApiKey(apiKey: string): Promise<void> {
-    this.token = apiKey;
-
-    // Fetch current user to get user ID
-    try {
-      const users = await this.get<any[]>('/Users');
-      if (users && users.length > 0) {
-        // Use the first user (typically the admin user when using API key)
-        this.userId = users[0].Id;
-      } else {
-        throw new AuthenticationError('No users found for this API key');
-      }
-    } catch (error) {
-      this.token = null;
-      throw error;
-    }
-  }
-
-  /**
    * Clear authentication token
    */
   clearToken(): void {
@@ -141,6 +120,15 @@ export class JellyfinClient {
         await this.handleErrorResponse(response);
       }
 
+      // Check if response has content
+      const contentLength = response.headers.get('content-length');
+      const contentType = response.headers.get('content-type');
+
+      // If no content (204) or empty body, return undefined
+      if (response.status === 204 || contentLength === '0' || !contentType?.includes('json')) {
+        return undefined as T;
+      }
+
       // Parse JSON response
       const data = await response.json();
       return data as T;
@@ -176,7 +164,7 @@ export class JellyfinClient {
       return result;
     }
 
-    return headers as Record<string, string>;
+    return headers;
   }
 
   /**
@@ -258,6 +246,9 @@ export class JellyfinClient {
   ): string {
     const params = new URLSearchParams();
 
+    // Browsers don't send custom headers for <img> tags, so include api_key in URL
+    if (this.token) params.append('api_key', this.token);
+
     if (options?.tag) params.append('tag', options.tag);
     if (options?.maxWidth) params.append('maxWidth', String(options.maxWidth));
     if (options?.maxHeight) params.append('maxHeight', String(options.maxHeight));
@@ -277,8 +268,9 @@ export class JellyfinClient {
     itemId: string,
     options?: {
       audioCodec?: string;
-      maxStreamingBitrate?: string;
+      audioBitRate?: number;
       container?: string;
+      static?: boolean;
     }
   ): string {
     if (!this.token) {
@@ -287,10 +279,17 @@ export class JellyfinClient {
 
     const params = new URLSearchParams({
       api_key: this.token,
+      deviceId: this.clientInfo.deviceId,
       audioCodec: options?.audioCodec || 'aac,mp3,opus',
-      maxStreamingBitrate: options?.maxStreamingBitrate || '320000',
       container: options?.container || 'opus,mp3,aac,m4a,flac',
     });
+
+    // Add audioBitRate if specified, otherwise use static=true for direct streaming
+    if (options?.audioBitRate) {
+      params.append('audioBitRate', String(options.audioBitRate));
+    } else if (options?.static !== false) {
+      params.append('static', 'true');
+    }
 
     return `${this.serverUrl}/Audio/${itemId}/stream?${params}`;
   }

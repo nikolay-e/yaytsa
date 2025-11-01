@@ -18,6 +18,86 @@ import {
 // Jellyfin uses ticks (100-nanosecond intervals)
 const TICKS_PER_SECOND = 10_000_000;
 
+/**
+ * Playback Reporter
+ * Simplified class for reporting playback events to Jellyfin server
+ * Useful for testing and standalone reporting scenarios
+ */
+export class PlaybackReporter {
+  constructor(private client: JellyfinClient) {}
+
+  /**
+   * Report playback start
+   */
+  async reportStart(itemId: string): Promise<void> {
+    if (!this.client.isAuthenticated()) {
+      throw new Error('Not authenticated');
+    }
+
+    const info: PlaybackStartInfo = {
+      ItemId: itemId,
+      PositionTicks: 0,
+      IsPaused: false,
+      PlayMethod: 'DirectPlay',
+      CanSeek: true,
+      VolumeLevel: 100,
+      IsMuted: false,
+    };
+
+    await this.client.post('/Sessions/Playing', info);
+  }
+
+  /**
+   * Report playback progress
+   */
+  async reportProgress(itemId: string, positionSeconds: number, isPaused: boolean): Promise<void> {
+    if (!this.client.isAuthenticated()) {
+      throw new Error('Not authenticated');
+    }
+
+    const info: PlaybackProgressInfo = {
+      ItemId: itemId,
+      PositionTicks: Math.floor(positionSeconds * TICKS_PER_SECOND),
+      IsPaused: isPaused,
+      PlayMethod: 'DirectPlay',
+      VolumeLevel: 100,
+      IsMuted: false,
+    };
+
+    await this.client.post('/Sessions/Playing/Progress', info);
+  }
+
+  /**
+   * Report playback stopped
+   */
+  async reportStopped(itemId: string, positionSeconds: number): Promise<void> {
+    if (!this.client.isAuthenticated()) {
+      throw new Error('Not authenticated');
+    }
+
+    const info: PlaybackStopInfo = {
+      ItemId: itemId,
+      PositionTicks: Math.floor(positionSeconds * TICKS_PER_SECOND),
+    };
+
+    await this.client.post('/Sessions/Playing/Stopped', info);
+  }
+
+  /**
+   * Convert seconds to ticks
+   */
+  static secondsToTicks(seconds: number): number {
+    return Math.floor(seconds * TICKS_PER_SECOND);
+  }
+
+  /**
+   * Convert ticks to seconds
+   */
+  static ticksToSeconds(ticks: number): number {
+    return ticks / TICKS_PER_SECOND;
+  }
+}
+
 export class PlaybackState {
   private state: PlayerState = {
     status: 'idle',
@@ -76,7 +156,7 @@ export class PlaybackState {
     this.state.currentItem = item;
     this.state.currentTime = 0;
 
-    if (item && item.RunTimeTicks) {
+    if (item?.RunTimeTicks) {
       this.state.duration = item.RunTimeTicks / TICKS_PER_SECOND;
     } else {
       this.state.duration = 0;
@@ -244,7 +324,7 @@ export class PlaybackState {
 
     this.progressReportTimer = setInterval(() => {
       if (this.state.status === 'playing' || this.state.status === 'paused') {
-        this.reportPlaybackProgress();
+        void this.reportPlaybackProgress();
       }
     }, this.PROGRESS_REPORT_INTERVAL);
   }

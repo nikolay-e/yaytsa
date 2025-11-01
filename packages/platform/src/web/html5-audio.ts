@@ -1,0 +1,172 @@
+/**
+ * HTML5 Audio implementation of AudioEngine
+ * Uses native browser <audio> element for playback
+ */
+
+import { AudioEngine } from '../audio.interface.js';
+
+export class HTML5AudioEngine implements AudioEngine {
+  private audio: HTMLAudioElement;
+  private _isPlaying: boolean = false;
+  private audioContext: AudioContext | null = null;
+
+  // Store event handler references for cleanup
+  private handlePlay = () => {
+    this._isPlaying = true;
+  };
+  private handlePause = () => {
+    this._isPlaying = false;
+  };
+  private handleEnded = () => {
+    this._isPlaying = false;
+  };
+
+  constructor() {
+    this.audio = new Audio();
+    this.audio.preload = 'auto';
+
+    // Track playing state
+    this.audio.addEventListener('play', this.handlePlay);
+    this.audio.addEventListener('pause', this.handlePause);
+    this.audio.addEventListener('ended', this.handleEnded);
+
+    // Initialize Audio Context for iOS background playback support
+    // This helps ensure iOS properly manages the audio session
+    if (typeof window !== 'undefined' && ('AudioContext' in window || 'webkitAudioContext' in window)) {
+      try {
+        const AudioContextClass = (window as any).AudioContext || (window as any).webkitAudioContext;
+        this.audioContext = new AudioContextClass();
+      } catch (error) {
+        // Audio context creation failed - not critical, fallback to basic audio
+        console.warn('Failed to create AudioContext:', error);
+      }
+    }
+  }
+
+  async load(url: string): Promise<void> {
+    return new Promise((resolve, reject) => {
+      // Set up one-time listeners
+      const handleCanPlay = () => {
+        this.audio.removeEventListener('canplay', handleCanPlay);
+        this.audio.removeEventListener('error', handleError);
+        resolve();
+      };
+
+      const handleError = () => {
+        this.audio.removeEventListener('canplay', handleCanPlay);
+        this.audio.removeEventListener('error', handleError);
+        const mediaError = this.audio.error;
+        const error = mediaError
+          ? new Error(`Failed to load audio: ${mediaError.message || 'Unknown error'}`)
+          : new Error('Failed to load audio');
+        reject(error);
+      };
+
+      this.audio.addEventListener('canplay', handleCanPlay, { once: true });
+      this.audio.addEventListener('error', handleError, { once: true });
+
+      // Load the URL
+      this.audio.src = url;
+      this.audio.load();
+    });
+  }
+
+  async play(): Promise<void> {
+    try {
+      // Resume Audio Context if suspended (iOS requirement for background playback)
+      if (this.audioContext?.state === 'suspended') {
+        await this.audioContext.resume();
+      }
+
+      await this.audio.play();
+    } catch (error) {
+      throw new Error(`Failed to play audio: ${(error as Error).message}`);
+    }
+  }
+
+  pause(): void {
+    this.audio.pause();
+  }
+
+  seek(seconds: number): void {
+    this.audio.currentTime = seconds;
+  }
+
+  setVolume(level: number): void {
+    // Clamp between 0 and 1
+    this.audio.volume = Math.max(0, Math.min(1, level));
+  }
+
+  getCurrentTime(): number {
+    return this.audio.currentTime;
+  }
+
+  getDuration(): number {
+    return this.audio.duration || 0;
+  }
+
+  getVolume(): number {
+    return this.audio.volume;
+  }
+
+  isPlaying(): boolean {
+    return this._isPlaying;
+  }
+
+  onTimeUpdate(callback: (seconds: number) => void): () => void {
+    const handler = () => callback(this.audio.currentTime);
+    this.audio.addEventListener('timeupdate', handler);
+    return () => this.audio.removeEventListener('timeupdate', handler);
+  }
+
+  onEnded(callback: () => void): () => void {
+    const handler = () => callback();
+    this.audio.addEventListener('ended', handler);
+    return () => this.audio.removeEventListener('ended', handler);
+  }
+
+  onError(callback: (error: Error) => void): () => void {
+    const handler = () => {
+      const mediaError = this.audio.error;
+      const error = mediaError
+        ? new Error(`Audio error: ${mediaError.message || 'Unknown error'}`)
+        : new Error('Unknown audio error');
+      callback(error);
+    };
+    this.audio.addEventListener('error', handler);
+    return () => this.audio.removeEventListener('error', handler);
+  }
+
+  onLoading(callback: (isLoading: boolean) => void): () => void {
+    const handleWaiting = () => callback(true);
+    const handleCanPlay = () => callback(false);
+    const handlePlaying = () => callback(false);
+
+    this.audio.addEventListener('waiting', handleWaiting);
+    this.audio.addEventListener('canplay', handleCanPlay);
+    this.audio.addEventListener('playing', handlePlaying);
+
+    return () => {
+      this.audio.removeEventListener('waiting', handleWaiting);
+      this.audio.removeEventListener('canplay', handleCanPlay);
+      this.audio.removeEventListener('playing', handlePlaying);
+    };
+  }
+
+  dispose(): void {
+    // Remove event listeners to prevent memory leaks
+    this.audio.removeEventListener('play', this.handlePlay);
+    this.audio.removeEventListener('pause', this.handlePause);
+    this.audio.removeEventListener('ended', this.handleEnded);
+
+    // Clean up audio element
+    this.audio.pause();
+    this.audio.src = '';
+    this.audio.load();
+
+    // Close audio context
+    if (this.audioContext && this.audioContext.state !== 'closed') {
+      void this.audioContext.close();
+    }
+  }
+}
