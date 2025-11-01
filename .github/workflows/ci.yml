@@ -80,7 +80,7 @@ jobs:
           JELLYFIN_SERVER_URL: ${{ secrets.JELLYFIN_SERVER_URL }}
           JELLYFIN_TEST_USERNAME: ${{ secrets.JELLYFIN_TEST_USERNAME }}
           JELLYFIN_TEST_PASSWORD: ${{ secrets.JELLYFIN_TEST_PASSWORD }}
-        run: npm run test:e2e -- --no-file-parallelism --poolOptions.threads.singleThread=true
+        run: npm run test:e2e -- --no-file-parallelism --pool=forks
 
   docker-build:
     name: Docker Build and Push
