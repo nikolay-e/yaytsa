@@ -154,7 +154,8 @@ describe('Feature: Queue Management', () => {
       // Then: Track 3 is playing
       expect(selectedTrack).toEqual(mockAlbumTracks[2]);
       ThenQueue.currentTrackIs(queue, mockAlbumTracks[2]);
-      ThenQueue.hasNoPreviousTrack(queue);
+      ThenQueue.hasPreviousTrack(queue); // Has tracks 1 and 2 before
+      ThenQueue.hasNoNextTrack(queue); // Last track
     });
   });
 
@@ -195,7 +196,7 @@ describe('Feature: Queue Management', () => {
 
       // When: User adds new track at position 1 (play next)
       const playNextTrack = createMockTrack('special-1', 'Play Next Track');
-      queue.insertAt(1, playNextTrack);
+      queue.insertAt(playNextTrack, 1);
 
       // Then: Queue has 4 tracks, current track unchanged
       ThenQueue.queueHasTracks(queue, 4);

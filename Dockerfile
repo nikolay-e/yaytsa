@@ -15,19 +15,19 @@ COPY packages/core/package.json ./packages/core/
 COPY packages/platform/package.json ./packages/platform/
 COPY packages/web/package.json ./packages/web/
 
-# Install all dependencies
-RUN npm install
+# Install all dependencies (skip prepare scripts like pre-commit)
+RUN npm install --ignore-scripts
 
 # Copy source code
 COPY packages/ ./packages/
-
-# Run as non-root user for security
-USER node
 
 # ============================================
 # Development Stage - Vite dev server
 # ============================================
 FROM base AS development
+
+# Note: Running as root in dev for volume permissions
+# Volumes mounted from host need write access
 
 # Expose Vite dev server port
 EXPOSE 5173
@@ -40,6 +40,7 @@ CMD ["npm", "run", "dev"]
 # ============================================
 FROM base AS builder
 
+# Note: Running as root for build
 # Build all packages (core, platform, and web)
 RUN npm run build
 

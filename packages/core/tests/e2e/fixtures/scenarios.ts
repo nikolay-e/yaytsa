@@ -212,8 +212,12 @@ export class WhenQueue {
   /**
    * When: User adds tracks to queue
    */
-  static addsTracks(queue: any, tracks: AudioItem[]): void {
-    queue.addToQueue(tracks);
+  static addsTracks(queue: any, tracks: AudioItem | AudioItem[]): void {
+    if (Array.isArray(tracks)) {
+      tracks.forEach((track) => queue.addToQueue(track));
+    } else {
+      queue.addToQueue(tracks);
+    }
   }
 
   /**
@@ -241,7 +245,7 @@ export class WhenQueue {
    * When: User removes track from queue
    */
   static removesTrack(queue: any, index: number): void {
-    queue.removeFromQueue(index);
+    queue.removeAt(index);
   }
 
   /**

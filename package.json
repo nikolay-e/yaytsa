@@ -25,6 +25,9 @@
     "prepare": "pre-commit install",
     "type-check": "cd packages/core && npx tsc --noEmit"
   },
+  "dependencies": {
+    "svelte-gestures": "^5.2.2"
+  },
   "devDependencies": {
     "@eslint/js": "^9.18.0",
     "@typescript-eslint/eslint-plugin": "^8.19.1",

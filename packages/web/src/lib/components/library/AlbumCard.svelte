@@ -143,4 +143,26 @@
     font-size: 0.75rem;
     color: var(--color-text-tertiary);
   }
+
+  /* Mobile: always show play button with lighter overlay */
+  @media (max-width: 768px) {
+    .play-overlay {
+      opacity: 0.8; /* Always visible on mobile */
+      background-color: rgba(0, 0, 0, 0.4); /* Lighter background */
+    }
+
+    .play-button {
+      width: 48px; /* Slightly smaller on mobile */
+      height: 48px;
+      transform: scale(1); /* Always full size */
+    }
+
+    .play-button:active {
+      transform: scale(0.95);
+    }
+
+    .album-name {
+      font-size: 0.9375rem; /* Slightly smaller for mobile */
+    }
+  }
 </style>
