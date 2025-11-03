@@ -15,13 +15,14 @@ export default defineConfig({
       key: fs.readFileSync(keyPath),
       cert: fs.readFileSync(certPath)
     },
+    strictPort: true,
+    port: 5173,
     hmr: {
-      port: 5173
+      protocol: 'wss'
     }
   } : {
-    hmr: {
-      port: 5173
-    }
+    strictPort: true,
+    port: 5173
   },
   build: {
     target: 'es2020',

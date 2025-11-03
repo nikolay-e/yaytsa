@@ -72,4 +72,12 @@
     font-size: 0.875rem;
     color: var(--color-error);
   }
+
+  /* Mobile touch targets - minimum 44px height */
+  @media (max-width: 768px) {
+    input {
+      padding: var(--spacing-md); /* Increase padding for 44px min-height */
+      min-height: 44px;
+    }
+  }
 </style>

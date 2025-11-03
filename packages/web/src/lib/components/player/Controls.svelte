@@ -229,4 +229,26 @@
     border-radius: 50%;
     cursor: pointer;
   }
+
+  /* Mobile touch targets - minimum 44x44px */
+  @media (max-width: 768px) {
+    .control-btn {
+      width: 44px;
+      height: 44px;
+    }
+
+    .play-btn {
+      width: 56px;
+      height: 56px;
+    }
+
+    .controls {
+      gap: var(--spacing-md); /* Increase gap for easier tap */
+    }
+
+    /* Hide volume control on mobile (will be replaced with modal in Phase 3) */
+    .volume-control {
+      display: none;
+    }
+  }
 </style>

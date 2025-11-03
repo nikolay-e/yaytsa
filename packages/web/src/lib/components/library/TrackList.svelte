@@ -170,13 +170,23 @@
 
   @media (max-width: 768px) {
     .track-list-row {
-      grid-template-columns: 32px 1fr 60px;
+      grid-template-columns: 40px 1fr 60px;
       gap: var(--spacing-sm);
-      padding: var(--spacing-sm);
+      padding: var(--spacing-md); /* Increase padding for 44px min-height */
+      min-height: 44px; /* Touch target minimum */
     }
 
+    /* Keep artist visible on mobile - important for compilations */
     .track-artist {
-      display: none;
+      font-size: 0.8125rem; /* Slightly smaller but still readable */
+    }
+
+    .track-number {
+      font-size: 0.8125rem;
+    }
+
+    .track-duration {
+      font-size: 0.8125rem;
     }
   }
 </style>

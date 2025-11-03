@@ -182,3 +182,57 @@ textarea:focus {
 ::-webkit-scrollbar-thumb:hover {
   background: var(--color-bg-hover);
 }
+
+/* Mobile-First Responsive Design */
+@media (width <= 768px) {
+  :root {
+    /* Reduce spacing for small screens to maximize content area */
+    --spacing-lg: 1rem; /* Reduced from 1.5rem */
+    --spacing-xl: 1.5rem; /* Reduced from 2rem */
+  }
+
+  /* Mobile typography optimization */
+  h1 {
+    font-size: 1.75rem; /* Reduced from 2rem */
+    line-height: 1.3; /* Tighter line-height for mobile */
+  }
+
+  h2 {
+    font-size: 1.25rem; /* Reduced from 1.5rem */
+    line-height: 1.3;
+  }
+
+  /* iOS smooth scrolling */
+  * {
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Hide scrollbar on mobile (auto-hides on touch devices) */
+  ::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* Additional breakpoints for precise control */
+@media (width <= 375px) {
+  /* Small phones (iPhone 13 mini, SE) */
+  :root {
+    --spacing-lg: 0.875rem; /* Even tighter spacing */
+    --spacing-xl: 1.25rem;
+  }
+}
+
+@media (width >= 390px) and (width <= 430px) {
+  /* Medium phones (iPhone 12/13/14/15) */
+  :root {
+    --spacing-lg: 1rem;
+    --spacing-xl: 1.5rem;
+  }
+}
+
+/* OLED Dark Mode Optimization (true black for battery saving) */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-bg-primary: #000; /* True black instead of #0f0f0f */
+  }
+}

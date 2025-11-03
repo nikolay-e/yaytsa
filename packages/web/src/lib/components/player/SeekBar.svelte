@@ -46,6 +46,7 @@
       class="slider"
       style:--progress="{progress}%"
       on:mousedown={handleSeekStart}
+      on:touchstart={handleSeekStart}
       on:input={handleSeekChange}
       on:change={handleSeekEnd}
       disabled={!duration}
@@ -149,5 +150,45 @@
   .slider:hover::-moz-range-thumb,
   .slider:active::-moz-range-thumb {
     opacity: 1;
+  }
+
+  /* Mobile touch-friendly seek bar */
+  @media (max-width: 768px) {
+    .slider {
+      height: 8px; /* Thicker track for easier touch */
+      padding: 8px 0; /* Add touch area around slider */
+    }
+
+    .slider::-webkit-slider-runnable-track {
+      height: 8px;
+    }
+
+    .slider::-moz-range-track {
+      height: 8px;
+    }
+
+    .slider::-moz-range-progress {
+      height: 8px;
+    }
+
+    /* Always visible, larger thumb on mobile */
+    .slider::-webkit-slider-thumb {
+      width: 20px;
+      height: 20px;
+      opacity: 1; /* Always visible on touch devices */
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3); /* Add shadow for visibility */
+    }
+
+    .slider::-moz-range-thumb {
+      width: 20px;
+      height: 20px;
+      opacity: 1; /* Always visible on touch devices */
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    }
+
+    .time {
+      font-size: 0.8125rem; /* Slightly larger for readability */
+      min-width: 45px;
+    }
   }
 </style>

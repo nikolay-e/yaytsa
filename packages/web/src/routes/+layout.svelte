@@ -273,6 +273,10 @@
 
     .content {
       margin-left: 0;
+      padding: var(--spacing-md); /* Reduce padding on mobile */
+      padding-left: calc(var(--spacing-md) + var(--safe-area-inset-left));
+      padding-right: calc(var(--spacing-md) + var(--safe-area-inset-right));
+      padding-top: calc(var(--spacing-md) + var(--safe-area-inset-top));
     }
 
     .nav-links {
