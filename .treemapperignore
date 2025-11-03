@@ -1,3 +1,6 @@
 package-lock.json
 jellyfin-api-spec.json
 tests
+test
+.dockerignore
+.gitignore

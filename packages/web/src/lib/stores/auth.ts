@@ -163,6 +163,18 @@ async function restoreSession(): Promise<boolean> {
     return false;
   }
 
+  // Validate server URL from session storage (prevent C-SSRF)
+  const isDevelopment = import.meta.env.DEV || import.meta.env.MODE === 'development';
+  try {
+    validateServerUrl(serverUrl, isDevelopment);
+  } catch {
+    // Invalid URL in session storage - clear session and return false
+    sessionStorage.removeItem(STORAGE_KEYS.SESSION);
+    sessionStorage.removeItem(STORAGE_KEYS.USER_ID);
+    sessionStorage.removeItem(STORAGE_KEYS.SERVER_URL);
+    return false;
+  }
+
   authStore.update((state) => ({ ...state, isLoading: true }));
 
   try {

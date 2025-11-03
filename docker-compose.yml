@@ -25,7 +25,7 @@ services:
       - /app/packages/core/dist
       - /app/packages/platform/dist
     working_dir: /app
-    command: sh -c "npm run build:core && npm run build:platform && cd packages/web && npm run dev -- --host 0.0.0.0"
+    command: npm run dev
     profiles:
       - dev
 

@@ -47,7 +47,7 @@ export function loadEnvironmentConfig(): EnvironmentConfig {
 
   if (hasImportMetaEnv) {
     // Vite/ESM environment
-    env = import.meta.env as any;
+    env = import.meta.env as Record<string, string | undefined>;
   } else if (isNode) {
     // Node.js environment
     env = process.env;
@@ -61,13 +61,17 @@ export function loadEnvironmentConfig(): EnvironmentConfig {
 
   return {
     jellyfinServerUrl:
-      runtimeConfig?.serverUrl || env.JELLYFIN_SERVER_URL,
+      runtimeConfig?.serverUrl ||
+      env.VITE_JELLYFIN_SERVER_URL ||
+      env.JELLYFIN_SERVER_URL,
     jellyfinClientName:
       runtimeConfig?.clientName ||
+      env.VITE_JELLYFIN_CLIENT_NAME ||
       env.JELLYFIN_CLIENT_NAME ||
       DEFAULT_CLIENT_NAME,
     jellyfinDeviceName:
       runtimeConfig?.deviceName ||
+      env.VITE_JELLYFIN_DEVICE_NAME ||
       env.JELLYFIN_DEVICE_NAME ||
       DEFAULT_DEVICE_NAME,
     jellyfinDeviceId: env.JELLYFIN_DEVICE_ID,

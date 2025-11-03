@@ -34,8 +34,14 @@ export class HTML5AudioEngine implements AudioEngine {
     // This helps ensure iOS properly manages the audio session
     if (typeof window !== 'undefined' && ('AudioContext' in window || 'webkitAudioContext' in window)) {
       try {
-        const AudioContextClass = (window as any).AudioContext || (window as any).webkitAudioContext;
-        this.audioContext = new AudioContextClass();
+        const windowWithAudio = window as typeof window & {
+          AudioContext?: typeof AudioContext;
+          webkitAudioContext?: typeof AudioContext;
+        };
+        const AudioContextClass = windowWithAudio.AudioContext || windowWithAudio.webkitAudioContext;
+        if (AudioContextClass) {
+          this.audioContext = new AudioContextClass();
+        }
       } catch (error) {
         // Audio context creation failed - not critical, fallback to basic audio
         console.warn('Failed to create AudioContext:', error);

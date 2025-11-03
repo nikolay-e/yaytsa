@@ -21,6 +21,9 @@ RUN npm install
 # Copy source code
 COPY packages/ ./packages/
 
+# Run as non-root user for security
+USER node
+
 # ============================================
 # Development Stage - Vite dev server
 # ============================================

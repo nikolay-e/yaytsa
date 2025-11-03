@@ -25,8 +25,15 @@ export class PlaylistsService {
     }
 
     // Build request body matching Jellyfin API schema
-    const body: any = {
+    const body: {
+      Name: string;
+      Ids?: string[];
+      MediaType?: string;
+      UserId: string;
+      IsPublic?: boolean;
+    } = {
       Name: options.name,
+      UserId: options.userId || userId,
     };
 
     if (options.itemIds && options.itemIds.length > 0) {
@@ -35,12 +42,6 @@ export class PlaylistsService {
 
     if (options.mediaType) {
       body.MediaType = options.mediaType;
-    }
-
-    if (options.userId) {
-      body.UserId = options.userId;
-    } else {
-      body.UserId = userId;
     }
 
     if (options.isPublic !== undefined) {

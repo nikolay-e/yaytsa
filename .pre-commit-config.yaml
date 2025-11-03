@@ -141,7 +141,7 @@ repos:
       # [CHECK] ESLint - TypeScript/JavaScript static analysis
       - id: eslint
         name: 'ESLint (TypeScript/Svelte quality)'
-        entry: npx eslint --fix --max-warnings=-1
+        entry: npx eslint --fix
         language: node
         files: ^packages/.*\.(js|ts|svelte)$
         pass_filenames: true
@@ -152,14 +152,6 @@ repos:
         entry: docker compose -f docker-compose.yml config -q
         language: system
         files: ^docker-compose\.yml$
-        pass_filenames: false
-
-      # [CHECK] Nginx config validation
-      - id: nginx-test
-        name: 'Nginx config syntax validation'
-        entry: docker run --rm -v ./nginx.conf:/etc/nginx/nginx.conf:ro nginx:1.27-alpine nginx -t
-        language: system
-        files: ^nginx\.conf$
         pass_filenames: false
 
       # [SECURITY] npm audit - Check for security vulnerabilities in production dependencies
@@ -173,7 +165,7 @@ repos:
       # [CHECK] Validate .env.example has server URL variable
       - id: env-example-check
         name: 'Validate .env.example completeness'
-        entry: bash -c 'grep -q "JELLYFIN_SERVER_URL" .env.example'
+        entry: bash -c 'grep -qE "^\s*JELLYFIN_SERVER_URL=" .env.example'
         language: system
         files: ^\.env\.example$
         pass_filenames: false

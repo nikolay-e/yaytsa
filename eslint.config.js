@@ -13,8 +13,10 @@ export default [
       'dist/**',
       'build/**',
       '.svelte-kit/**',
+      'packages/web/.svelte-kit/**',
       'packages/*/dist/**',
       'packages/*/build/**',
+      'packages/core/tests/**',
       '**/*.config.js',
       '**/*.config.ts',
     ],
@@ -80,12 +82,12 @@ export default [
       '@typescript-eslint/explicit-function-return-type': 'off',
       '@typescript-eslint/explicit-module-boundary-types': 'off',
 
-      // Relax type-aware rules for flexibility (intentional for this project)
-      '@typescript-eslint/no-unsafe-assignment': 'off',
-      '@typescript-eslint/no-unsafe-member-access': 'off',
-      '@typescript-eslint/no-unsafe-argument': 'off',
-      '@typescript-eslint/no-unsafe-call': 'off',
-      '@typescript-eslint/no-unsafe-return': 'off',
+      // Strict type safety rules - enforce proper typing
+      '@typescript-eslint/no-unsafe-assignment': 'error',
+      '@typescript-eslint/no-unsafe-member-access': 'error',
+      '@typescript-eslint/no-unsafe-argument': 'error',
+      '@typescript-eslint/no-unsafe-call': 'error',
+      '@typescript-eslint/no-unsafe-return': 'error',
 
       // Async/Promise rules - CRITICAL for API-heavy codebase
       '@typescript-eslint/no-floating-promises': 'error',

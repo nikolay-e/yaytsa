@@ -64,7 +64,6 @@ const NEVER_CACHE_PATTERNS = [
   '/Sessions/', // Active sessions
   '/System/Ping', // System ping
   '/Startup/', // Startup endpoints
-  '/Users/{userId}', // User profile data (contains sensitive info)
 ];
 
 // Fetch event - implement caching strategies

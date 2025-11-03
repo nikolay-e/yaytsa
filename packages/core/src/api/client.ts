@@ -130,8 +130,8 @@ export class JellyfinClient {
       }
 
       // Parse JSON response
-      const data = await response.json();
-      return data as T;
+      const data: T = await response.json() as T;
+      return data;
     } catch (error) {
       // Network errors or parsing errors
       if (error instanceof JellyfinError) {
@@ -171,20 +171,23 @@ export class JellyfinClient {
    * Handle error response from API
    */
   private async handleErrorResponse(response: Response): Promise<never> {
-    let errorData: any;
+    let errorData: unknown;
     try {
-      errorData = await response.json();
+      errorData = await response.json() as unknown;
     } catch {
       errorData = null;
     }
 
-    const message = errorData?.message || response.statusText || 'Request failed';
+    const message =
+      (typeof errorData === 'object' && errorData !== null && 'message' in errorData && typeof errorData.message === 'string'
+        ? errorData.message
+        : undefined) || response.statusText || 'Request failed';
 
     if (response.status === 401 || response.status === 403) {
-      throw new AuthenticationError(message, response.status, errorData);
+      throw new AuthenticationError(message, response.status, errorData as Record<string, unknown>);
     }
 
-    throw new JellyfinError(message, response.status, errorData);
+    throw new JellyfinError(message, response.status, errorData as Record<string, unknown>);
   }
 
   /**
