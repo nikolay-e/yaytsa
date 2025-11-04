@@ -26,8 +26,8 @@ export class JellyfinClient {
    * Normalize server URL (remove trailing slash)
    */
   private normalizeUrl(url: string): string {
-    if (!url) {
-      throw new Error('Server URL is required');
+    if (!url || typeof url !== 'string') {
+      throw new Error('Server URL is required and must be a string');
     }
     return url.replace(/\/$/, '');
   }
