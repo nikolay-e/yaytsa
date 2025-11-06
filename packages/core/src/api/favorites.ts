@@ -22,8 +22,8 @@ export class FavoritesService extends BaseService {
   async markFavorite(itemId: string): Promise<UserItemData> {
     const userId = this.requireAuth();
     const result = await this.client.post<UserItemData>(
-      `/UserItems/${itemId}/UserData`,
-      { IsFavorite: true },
+      `/UserFavoriteItems/${itemId}`,
+      null,
       { userId }
     );
     if (!result) {
@@ -37,9 +37,8 @@ export class FavoritesService extends BaseService {
    */
   async unmarkFavorite(itemId: string): Promise<UserItemData> {
     const userId = this.requireAuth();
-    const result = await this.client.post<UserItemData>(
-      `/UserItems/${itemId}/UserData`,
-      { IsFavorite: false },
+    const result = await this.client.delete<UserItemData>(
+      `/UserFavoriteItems/${itemId}`,
       { userId }
     );
     if (!result) {
