@@ -332,8 +332,24 @@ export class JellyfinClient {
   /**
    * POST request
    */
-  async post<T>(endpoint: string, data?: any): Promise<T | undefined> {
-    return this.request<T>(endpoint, {
+  async post<T>(endpoint: string, data?: any, params?: Record<string, any>): Promise<T | undefined> {
+    let url = endpoint;
+
+    if (params) {
+      const searchParams = new URLSearchParams();
+      Object.entries(params).forEach(([key, value]) => {
+        if (value !== undefined && value !== null) {
+          searchParams.append(key, String(value));
+        }
+      });
+
+      const queryString = searchParams.toString();
+      if (queryString) {
+        url = `${endpoint}?${queryString}`;
+      }
+    }
+
+    return this.request<T>(url, {
       method: 'POST',
       body: data ? JSON.stringify(data) : undefined,
     });
@@ -342,8 +358,24 @@ export class JellyfinClient {
   /**
    * DELETE request
    */
-  async delete<T>(endpoint: string): Promise<T | undefined> {
-    return this.request<T>(endpoint, { method: 'DELETE' });
+  async delete<T>(endpoint: string, params?: Record<string, any>): Promise<T | undefined> {
+    let url = endpoint;
+
+    if (params) {
+      const searchParams = new URLSearchParams();
+      Object.entries(params).forEach(([key, value]) => {
+        if (value !== undefined && value !== null) {
+          searchParams.append(key, String(value));
+        }
+      });
+
+      const queryString = searchParams.toString();
+      if (queryString) {
+        url = `${endpoint}?${queryString}`;
+      }
+    }
+
+    return this.request<T>(url, { method: 'DELETE' });
   }
 
   /**

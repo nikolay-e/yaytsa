@@ -169,3 +169,21 @@ repos:
         language: system
         files: ^\.env\.example$
         pass_filenames: false
+
+      # [CHECK] Docker build validation
+      - id: docker-build
+        name: 'Docker build validation'
+        entry: docker build -t jellyfin-miniclient:test .
+        language: system
+        files: ^(Dockerfile|docker-entrypoint\.sh|nginx\.conf\.template|packages/.*/.*\.(ts|svelte|js|json)|package\.json)$
+        pass_filenames: false
+        stages: [push]
+
+      # [CHECK] Integration tests (core package)
+      - id: integration-tests-core
+        name: 'Integration tests (core)'
+        entry: bash -c 'cd packages/core && npm run test:e2e'
+        language: system
+        files: ^packages/core/src/.*\.ts$
+        pass_filenames: false
+        stages: [push]
