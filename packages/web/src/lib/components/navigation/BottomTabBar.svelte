@@ -109,6 +109,7 @@
 
   .tab.active {
     color: var(--color-accent);
+    background-color: rgba(29, 185, 84, 0.1); /* Subtle green background */
   }
 
   .tab svg {
@@ -123,7 +124,7 @@
   }
 
   .tab.active .tab-label {
-    font-weight: 600;
+    font-weight: 700; /* Bolder font for active tab */
   }
 
   /* Desktop: hide bottom tab bar, use sidebar instead */

@@ -161,39 +161,40 @@
   /* Mobile touch-friendly seek bar */
   @media (max-width: 768px) {
     .slider {
-      height: 8px; /* Thicker track for easier touch */
-      padding: 8px 0; /* Add touch area around slider */
+      height: 4px;
+      padding: 10px 0; /* Larger touch area */
     }
 
     .slider::-webkit-slider-runnable-track {
-      height: 8px;
+      height: 4px;
     }
 
     .slider::-moz-range-track {
-      height: 8px;
+      height: 4px;
     }
 
     .slider::-moz-range-progress {
-      height: 8px;
+      height: 4px;
     }
 
-    /* Always visible, larger thumb on mobile */
+    /* Always visible, larger thumb on mobile - centered on track */
     .slider::-webkit-slider-thumb {
-      width: 24px;
-      height: 24px;
-      opacity: 1; /* Always visible on touch devices */
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3); /* Add shadow for visibility */
+      width: 20px;
+      height: 20px;
+      margin-top: -8px; /* Center thumb on track: (thumb_height - track_height) / 2 */
+      opacity: 1;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
     }
 
     .slider::-moz-range-thumb {
-      width: 24px;
-      height: 24px;
-      opacity: 1; /* Always visible on touch devices */
+      width: 20px;
+      height: 20px;
+      opacity: 1;
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
     }
 
     .time {
-      font-size: 0.8125rem; /* Slightly larger for readability */
+      font-size: 0.8125rem;
       min-width: 45px;
     }
   }
