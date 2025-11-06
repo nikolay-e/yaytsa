@@ -125,23 +125,32 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Extract metadata (tags, labels)
+      - name: Generate image tags
+        id: tags
+        run: |
+          BRANCH_NAME="${GITHUB_REF#refs/heads/}"
+          SHORT_SHA="$(git rev-parse --short HEAD)"
+          TIMESTAMP="$(date +%s)"
+
+          # Primary tag: branch-sha-timestamp (for ArgoCD Image Updater)
+          PRIMARY_TAG="${BRANCH_NAME}-${SHORT_SHA}-${TIMESTAMP}"
+
+          # Also tag with 'latest' on main branch for convenience
+          TAGS="${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${PRIMARY_TAG}"
+          if [[ "$BRANCH_NAME" == "main" ]]; then
+            TAGS="${TAGS},${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest"
+          elif [[ "$BRANCH_NAME" == "develop" ]]; then
+            TAGS="${TAGS},${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:staging-latest"
+          fi
+
+          echo "tags=${TAGS}" >> "$GITHUB_OUTPUT"
+          echo "primary_tag=${PRIMARY_TAG}" >> "$GITHUB_OUTPUT"
+
+      - name: Extract metadata (labels)
         id: meta
         uses: docker/metadata-action@v5
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-          tags: |
-            # Tag with 'latest' on main branch
-            type=raw,value=latest,enable={{is_default_branch}}
-            # Tag with 'staging-latest' on develop branch
-            type=raw,value=staging-latest,enable=${{ github.ref == 'refs/heads/develop' }}
-            # Tag with branch name
-            type=ref,event=branch
-            # Tag with git tag
-            type=semver,pattern={{version}}
-            type=semver,pattern={{major}}.{{minor}}
-            # Tag with commit SHA for branch pushes
-            type=sha,format=short
 
       - name: Build and push Docker image
         id: build
@@ -150,7 +159,7 @@ jobs:
           context: .
           target: production
           push: ${{ github.event_name != 'pull_request' }}
-          tags: ${{ steps.meta.outputs.tags }}
+          tags: ${{ steps.tags.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
@@ -158,4 +167,7 @@ jobs:
 
       - name: Image digest
         if: github.event_name != 'pull_request'
-        run: echo "Image pushed with digest ${{ steps.build.outputs.digest }}"
+        run: |
+          echo "Image pushed with tags: ${{ steps.tags.outputs.tags }}"
+          echo "Primary tag: ${{ steps.tags.outputs.primary_tag }}"
+          echo "Digest: ${{ steps.build.outputs.digest }}"
