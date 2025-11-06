@@ -4,10 +4,10 @@ description: A portable, minimal music client for Jellyfin
 type: application
 
 # Chart version - increment this on chart changes
-version: 0.1.0
+version: 0.1.1
 
 # Application version - should match the Docker image tag
-appVersion: '0.1.0'
+appVersion: '0.1.1'
 
 keywords:
   - jellyfin
