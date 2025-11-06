@@ -181,10 +181,12 @@ repos:
         stages: [pre-push]
 
       # [CHECK] Integration tests (core package)
+      # Note: Runs in manual stage due to external Jellyfin server dependency
+      # Run manually with: pre-commit run integration-tests-core --hook-stage manual --all-files
       - id: integration-tests-core
         name: 'Integration tests (core)'
         entry: bash -c 'cd packages/core && npm run test:e2e'
         language: system
         files: ^packages/core/src/.*\.ts$
         pass_filenames: false
-        stages: [pre-push]
+        stages: [manual]

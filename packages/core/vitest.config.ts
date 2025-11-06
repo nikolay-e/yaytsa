@@ -8,6 +8,7 @@ export default defineConfig(({ mode }) => {
   return {
     test: {
       // E2E tests against real server - run serially to avoid rate limiting
+      fileParallelism: false,
       sequence: {
         concurrent: false,
         shuffle: false,
