@@ -50,7 +50,8 @@ client.subscribe($client => {
     const itemsService = new ItemsService($client);
     libraryStore.update(state => ({ ...state, itemsService }));
   } else {
-    libraryStore.update(state => ({ ...state, itemsService: null }));
+    // Clear all library data when client is null (logout)
+    libraryStore.set(initialState);
   }
 });
 

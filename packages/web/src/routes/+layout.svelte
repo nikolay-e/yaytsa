@@ -73,6 +73,11 @@
     goto('/');
   }
 
+  // Redirect non-authenticated users to login page (after initial loading)
+  $: if (!loading && !$isAuthenticated && $page.url.pathname !== '/login') {
+    goto('/login');
+  }
+
   $: showPlayerBar = $currentTrack !== null;
   // Content padding must account for bottom tabs + gap + player bar + safe area
   // Bottom tabs: 56px, Gap: 8px, Player bar: 90px (when active), Safe area: dynamic

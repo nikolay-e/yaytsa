@@ -85,8 +85,10 @@ client.subscribe($client => {
     playbackState = new PlaybackState($client);
     playerStore.update(state => ({ ...state, state: playbackState }));
   } else {
+    // Client disconnected (logout) - clear playback but preserve volume
     playbackState = null;
-    playerStore.update(state => ({ ...state, state: null }));
+    const currentVolume = get(playerStore).volume;
+    playerStore.set({ ...initialState, volume: currentVolume });
   }
 });
 
@@ -575,12 +577,23 @@ export const queueItems = derived(playerStore, $player => {
 /**
  * Cleanup player resources (called on logout)
  * Disposes PlaybackState timer to prevent memory leaks
+ * Resets player state to initial values
  */
 function cleanup(): void {
+  // Stop playback
+  if (audioEngine) {
+    audioEngine.pause();
+  }
+
+  // Dispose playback state timer
   if (playbackState) {
     playbackState.dispose();
     playbackState = null;
   }
+
+  // Reset player state (preserve volume setting)
+  const currentVolume = get(playerStore).volume;
+  playerStore.set({ ...initialState, volume: currentVolume });
 }
 
 export const player = {
