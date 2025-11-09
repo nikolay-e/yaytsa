@@ -38,9 +38,6 @@
   <div class="form-header">
     <h1>Jellyfin Mini Player</h1>
     <p>Sign in to start listening</p>
-    {#if serverUrl}
-      <p class="server-info">Connected to: <strong>{new URL(serverUrl).hostname}</strong></p>
-    {/if}
   </div>
 
   <form on:submit|preventDefault={handleSubmit}>
@@ -105,16 +102,6 @@
 
   .form-header p {
     color: var(--color-text-secondary);
-  }
-
-  .server-info {
-    font-size: 0.875rem;
-    margin-top: var(--spacing-sm);
-    color: var(--color-text-secondary);
-  }
-
-  .server-info strong {
-    color: var(--color-accent);
   }
 
   form {
