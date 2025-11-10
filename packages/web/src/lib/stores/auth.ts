@@ -171,14 +171,6 @@ async function logout(): Promise<void> {
   // SECURITY: Clear IndexedDB cache on logout to prevent data leakage
   try {
     const { cacheManager } = await import('../cache/cache-manager.js');
-
-    // Revoke all Object URLs to prevent memory leaks
-    const imageCache = cacheManager.getImageCache();
-    if (imageCache) {
-      imageCache.revokeAllObjectUrls();
-    }
-
-    // Clear all caches (API + Images)
     await cacheManager.clearAll();
     logger.info('[Cache] Cleared all caches on logout');
   } catch (error) {

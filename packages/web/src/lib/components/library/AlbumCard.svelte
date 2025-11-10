@@ -1,7 +1,6 @@
 <script lang="ts">
-  import { onMount, onDestroy } from 'svelte';
   import type { MusicAlbum } from '@yaytsa/core';
-  import { getCachedAlbumArtUrl, getAlbumArtUrl } from '../../utils/image.js';
+  import { getAlbumArtUrl } from '../../utils/image.js';
   import { player } from '../../stores/player.js';
   import { library } from '../../stores/library.js';
   import { hapticSelect } from '../../utils/haptics.js';
@@ -9,29 +8,7 @@
 
   export let album: MusicAlbum;
 
-  let albumArtUrl = getAlbumArtUrl(album.Id, 'medium'); // Fallback sync URL
-  let isObjectUrl = false; // Track if URL needs revocation
-
-  // Load cached image on mount
-  onMount(async () => {
-    try {
-      const cachedUrl = await getCachedAlbumArtUrl(album.Id, 'medium');
-      if (cachedUrl) {
-        albumArtUrl = cachedUrl;
-        isObjectUrl = cachedUrl.startsWith('blob:'); // Mark for cleanup
-      }
-    } catch {
-      // Fallback to direct URL already set (non-critical error)
-      // Skip logging in production
-    }
-  });
-
-  // Revoke Object URL on component unmount to prevent memory leaks
-  onDestroy(() => {
-    if (isObjectUrl && albumArtUrl) {
-      URL.revokeObjectURL(albumArtUrl);
-    }
-  });
+  const albumArtUrl = getAlbumArtUrl(album.Id, 'medium');
 
   async function playAlbum(event: MouseEvent) {
     event.preventDefault();

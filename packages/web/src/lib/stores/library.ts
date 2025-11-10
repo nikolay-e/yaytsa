@@ -12,7 +12,6 @@ import {
   getCachedRecentAlbums,
   getCachedAlbumTracks,
 } from '../services/cached-items-service.js';
-import { preloadAlbumArts } from '../utils/image.js';
 
 interface LibraryState {
   itemsService: ItemsService | null;
@@ -109,12 +108,6 @@ async function loadAlbums(options?: { limit?: number; startIndex?: number }): Pr
     });
 
     handler.success({ albums: result.Items });
-
-    // Preload album art in background (non-blocking)
-    if (result.Items.length > 0) {
-      const albumIds = result.Items.map(album => album.Id);
-      void preloadAlbumArts(albumIds, 'medium');
-    }
   } catch (error) {
     handler.error(error as Error);
     throw error;
@@ -135,12 +128,6 @@ async function loadRecentAlbums(limit: number = 20): Promise<void> {
     const result = await getCachedRecentAlbums(itemsService, limit);
 
     handler.success({ albums: result.Items });
-
-    // Preload album art in background (non-blocking)
-    if (result.Items.length > 0) {
-      const albumIds = result.Items.map(album => album.Id);
-      void preloadAlbumArts(albumIds, 'medium');
-    }
   } catch (error) {
     handler.error(error as Error);
     throw error;
