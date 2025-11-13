@@ -25,9 +25,9 @@ cp .env.example .env
 1. Update `.env` with your Jellyfin server credentials:
 
 ```
-JELLYFIN_SERVER_URL=https://your-server.com
-JELLYFIN_TEST_USERNAME=your-username
-JELLYFIN_TEST_PASSWORD=your-password
+YAYTSA_SERVER_URL=https://your-server.com
+YAYTSA_TEST_USERNAME=your-username
+YAYTSA_TEST_PASSWORD=your-password
 ```
 
 ## Running Tests
@@ -182,9 +182,9 @@ npx playwright codegen http://localhost:5173
 
 ## Environment Variables
 
-- `JELLYFIN_SERVER_URL` - Jellyfin server URL
-- `JELLYFIN_TEST_USERNAME` - Test user username
-- `JELLYFIN_TEST_PASSWORD` - Test user password
+- `YAYTSA_SERVER_URL` - Jellyfin server URL
+- `YAYTSA_TEST_USERNAME` - Test user username
+- `YAYTSA_TEST_PASSWORD` - Test user password
 - `BASE_URL` - Application base URL (default: <http://localhost:5173>)
 - `CI` - Set to true in CI environment
 

@@ -330,9 +330,9 @@ npm run test:e2e
 **Environment Variables** (`.env` required for E2E):
 
 ```bash
-JELLYFIN_SERVER_URL=https://your-server.com
-JELLYFIN_TEST_USERNAME=test-user
-JELLYFIN_TEST_PASSWORD=test-password
+YAYTSA_SERVER_URL=https://your-server.com
+YAYTSA_TEST_USERNAME=test-user
+YAYTSA_TEST_PASSWORD=test-password
 ```
 
 ## Security Implementation

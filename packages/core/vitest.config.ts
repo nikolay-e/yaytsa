@@ -23,9 +23,10 @@ export default defineConfig(({ mode }) => {
       // Longer timeout for network requests
       testTimeout: 30000,
       hookTimeout: 30000,
-      // Environment variables - merge loaded .env with test-specific vars
+      // Environment variables - merge loaded .env with process.env (CI secrets)
       env: {
         ...env,
+        ...process.env, // CI environment variables take precedence
         NODE_ENV: 'test',
       },
       // Show test output

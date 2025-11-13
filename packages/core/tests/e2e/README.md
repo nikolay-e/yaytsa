@@ -64,7 +64,7 @@ npm run test:e2e --workspace=@yaytsa/core tests/e2e/features/queue-management
 Create `.env` file at project root:
 
 ```bash
-JELLYFIN_SERVER_URL=https://your-server.com
-JELLYFIN_TEST_USERNAME=your-username
-JELLYFIN_TEST_PASSWORD=your-password
+YAYTSA_SERVER_URL=https://your-server.com
+YAYTSA_TEST_USERNAME=your-username
+YAYTSA_TEST_PASSWORD=your-password
 ```

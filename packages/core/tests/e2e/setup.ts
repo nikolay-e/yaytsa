@@ -35,6 +35,7 @@ export function loadTestConfig(): TestConfig {
   console.log(`\nE2E Test Configuration:`);
   console.log(`  Server: ${serverUrl}`);
   console.log(`  Credentials: Configured`);
+  console.log(`  Username length: ${username.length}, Password length: ${password.length}`);
   console.log(
     `  Note: If tests fail with 500 errors, verify credentials work in Jellyfin web UI\n`
   );
