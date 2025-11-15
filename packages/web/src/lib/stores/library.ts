@@ -22,6 +22,11 @@ interface LibraryState {
   currentArtist: MusicArtist | null;
   isLoading: boolean;
   error: string | null;
+  albumsPagination: {
+    offset: number;
+    hasMore: boolean;
+    isLoadingMore: boolean;
+  };
 }
 
 const initialState: LibraryState = {
@@ -33,6 +38,11 @@ const initialState: LibraryState = {
   currentArtist: null,
   isLoading: false,
   error: null,
+  albumsPagination: {
+    offset: 0,
+    hasMore: true,
+    isLoadingMore: false,
+  },
 };
 
 const libraryStore = writable<LibraryState>(initialState);
@@ -92,6 +102,7 @@ async function waitForService(): Promise<ItemsService> {
 
 /**
  * Load albums from server (with caching)
+ * Resets pagination state - use for initial load
  */
 async function loadAlbums(options?: { limit?: number; startIndex?: number }): Promise<void> {
   const handler = createAsyncStoreHandler(libraryStore);
@@ -102,14 +113,70 @@ async function loadAlbums(options?: { limit?: number; startIndex?: number }): Pr
 
     // Use cached version
     const result = await getCachedAlbums(itemsService, {
-      limit: options?.limit,
-      startIndex: options?.startIndex,
+      limit: options?.limit ?? 30, // Default to 30 albums
+      startIndex: options?.startIndex ?? 0,
       sortBy: 'SortName',
     });
 
-    handler.success({ albums: result.Items });
+    // Reset pagination state on initial load
+    handler.success({
+      albums: result.Items,
+      albumsPagination: {
+        offset: result.Items.length,
+        hasMore: result.TotalRecordCount > result.Items.length,
+        isLoadingMore: false,
+      },
+    });
   } catch (error) {
     handler.error(error as Error);
+    throw error;
+  }
+}
+
+/**
+ * Load more albums (for infinite scroll)
+ * Appends to existing albums array
+ */
+async function loadMoreAlbums(): Promise<void> {
+  const state = get(libraryStore);
+
+  // Prevent duplicate loads or loading when no more albums
+  if (state.albumsPagination.isLoadingMore || !state.albumsPagination.hasMore) {
+    return;
+  }
+
+  // Set loading state
+  libraryStore.update(s => ({
+    ...s,
+    albumsPagination: { ...s.albumsPagination, isLoadingMore: true },
+  }));
+
+  try {
+    const itemsService = await waitForService();
+
+    const result = await getCachedAlbums(itemsService, {
+      limit: 30,
+      startIndex: state.albumsPagination.offset,
+      sortBy: 'SortName',
+    });
+
+    // Append new albums to existing array
+    libraryStore.update(s => ({
+      ...s,
+      albums: [...s.albums, ...result.Items],
+      albumsPagination: {
+        offset: s.albumsPagination.offset + result.Items.length,
+        hasMore: s.albumsPagination.offset + result.Items.length < result.TotalRecordCount,
+        isLoadingMore: false,
+      },
+    }));
+  } catch (error) {
+    // Reset loading state on error
+    libraryStore.update(s => ({
+      ...s,
+      albumsPagination: { ...s.albumsPagination, isLoadingMore: false },
+      error: (error as Error).message,
+    }));
     throw error;
   }
 }
@@ -275,10 +342,16 @@ export const currentAlbum = derived(libraryStore, $library => $library.currentAl
 export const currentArtist = derived(libraryStore, $library => $library.currentArtist);
 export const isLoading = derived(libraryStore, $library => $library.isLoading);
 export const error = derived(libraryStore, $library => $library.error);
+export const hasMoreAlbums = derived(libraryStore, $library => $library.albumsPagination.hasMore);
+export const isLoadingMoreAlbums = derived(
+  libraryStore,
+  $library => $library.albumsPagination.isLoadingMore,
+);
 
 export const library = {
   subscribe: libraryStore.subscribe,
   loadAlbums,
+  loadMoreAlbums,
   loadRecentAlbums,
   loadArtists,
   loadAlbumTracks,

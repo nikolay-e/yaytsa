@@ -3,16 +3,24 @@
   export let params = {};
 
   import { onMount } from 'svelte';
-  import { library, albums, isLoading } from '../../lib/stores/library.js';
+  import { library, albums, isLoading, isLoadingMoreAlbums } from '../../lib/stores/library.js';
   import AlbumGrid from '../../lib/components/library/AlbumGrid.svelte';
 
   onMount(async () => {
     try {
-      await library.loadAlbums({ limit: 100 });
+      await library.loadAlbums();
     } catch (error) {
       console.error('Failed to load albums:', error);
     }
   });
+
+  async function handleLoadMore() {
+    try {
+      await library.loadMoreAlbums();
+    } catch (error) {
+      console.error('Failed to load more albums:', error);
+    }
+  }
 </script>
 
 <svelte:head>
@@ -25,7 +33,7 @@
     <p>Browse your music collection</p>
   </header>
 
-  <AlbumGrid albums={$albums} loading={$isLoading} />
+  <AlbumGrid albums={$albums} loading={$isLoading || $isLoadingMoreAlbums} onLoadMore={handleLoadMore} />
 </div>
 
 <style>
